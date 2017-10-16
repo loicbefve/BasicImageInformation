@@ -19,6 +19,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private JMenu fileMenu = new JMenu("File");
 
 	private JMenuItem itemClose = new JMenuItem("Close");
+	private JMenuItem itemSave = new JMenuItem("Save");
 
 	public ImageViewer () {
 		this.setTitle("Image Viewer");
@@ -54,7 +55,14 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 			}        
 		});
 		this.fileMenu.add(itemClose);  
-
+		
+		itemSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//faire ce que je veux
+			}
+		});
+		this.fileMenu.add(itemSave);
+		
 		this.menuBar.add(fileMenu);
 		this.setJMenuBar(menuBar);
 
