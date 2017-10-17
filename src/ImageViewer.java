@@ -46,17 +46,13 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		inversion.setLayout(new BoxLayout(inversion, BoxLayout.PAGE_AXIS));
 		inversion.add(buttonInversion);
 		
-		// Defines action associated to buttons
-		buttonAction.addActionListener(new ButtonListener());
-		
 		JPanel histo = new JPanel();
 		histo.setLayout(new BoxLayout(histo, BoxLayout.PAGE_AXIS));
 		histo.add(buttonHisto);
+		
 		// Defines action associated to buttons
+		buttonAction.addActionListener(new ButtonListener());
 		buttonHisto.addActionListener(new Histolistener(ouputImage));
-
-		JPanel output = new JPanel();
-
 		buttonInversion.addActionListener(new InversionListener());
 		
 		//Image de sortie
