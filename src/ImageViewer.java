@@ -40,7 +40,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		histo.setLayout(new BoxLayout(histo, BoxLayout.PAGE_AXIS));
 		histo.add(buttonHisto);
 		// Defines action associated to buttons
-		buttonHisto.addActionListener(new HistoListener(input));
+		buttonHisto.addActionListener(new Histolistener(ouputImage));
 
 		JPanel output = new JPanel();
 		output.setLayout(new BoxLayout(output, BoxLayout.PAGE_AXIS));
