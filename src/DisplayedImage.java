@@ -7,10 +7,11 @@ import javax.swing.JPanel;
  
 public class DisplayedImage extends JPanel {
 	
-    private BufferedImage image;
+    BufferedImage image;
     
     public DisplayedImage() {
     		try {
+    			//Lecture de l'image et stockage dans un BufferedImage
     			image = ImageIO.read(new File("img.png"));
         	} catch (IOException e) {
         		e.printStackTrace();
@@ -20,11 +21,10 @@ public class DisplayedImage extends JPanel {
     public void paintComponent(Graphics g){
     		//g.drawImage(image, 0, 0, this); // draw as much as possible
     		g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), this); // draw full image
-    }
+    } 
     
-    public BufferedImage getImage()
-    {
-    	return image;
+    public BufferedImage getImage(){
+    	
+    	return this.image;
     }
 }
-	
