@@ -6,8 +6,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import org.jfree.chart.*; 
 import org.jfree.chart.plot.*; 
-import org.jfree.data.statistics.HistogramDataset; 
-import org.jfree.data.general.AbstractDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 
@@ -43,7 +41,6 @@ public class Histolistener implements ActionListener {
 		BufferedImage im=image.getImage();
 		int h=im.getHeight();
 		int w=im.getWidth();
-		System.out.println(h+" "+w);
 		int R=0;int V=0;int B=0;
 		int nR=0;int nV=0;int nB=0;
 		for(int i=0;i<w;i++){

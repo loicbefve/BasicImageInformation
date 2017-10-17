@@ -7,7 +7,8 @@ import javax.swing.JPanel;
  
 public class DisplayedImage extends JPanel {
 	
-    BufferedImage image;
+	private static final long serialVersionUID = -3544787848737362127L;
+	BufferedImage image;
     
     public DisplayedImage() {
     		try {
