@@ -16,6 +16,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private DisplayedImage inputImage = new DisplayedImage(); 
 	private DisplayedImage ouputImage = new DisplayedImage();
 	private JButton buttonAction = new JButton("Action");
+	private JButton buttonHisto = new JButton("Histogramme");
 	private JButton buttonInversion = new JButton("Inversion");
 
 	private JMenuBar menuBar = new JMenuBar();
@@ -47,6 +48,15 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		
 		// Defines action associated to buttons
 		buttonAction.addActionListener(new ButtonListener());
+		
+		JPanel histo = new JPanel();
+		histo.setLayout(new BoxLayout(histo, BoxLayout.PAGE_AXIS));
+		histo.add(buttonHisto);
+		// Defines action associated to buttons
+		buttonHisto.addActionListener(new Histolistener(ouputImage));
+
+		JPanel output = new JPanel();
+
 		buttonInversion.addActionListener(new InversionListener());
 		
 		//Image de sortie
@@ -57,6 +67,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		global.setLayout(new BoxLayout(global, BoxLayout.LINE_AXIS));
 		global.add(input);
 		global.add(action);
+		global.add(histo);
 		global.add(inversion);
 		global.add(output);
 
@@ -80,10 +91,13 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	 * Class listening to a given button
 	 */
 	class ButtonListener implements ActionListener{
+		
+		
 		public void actionPerformed(ActionEvent arg0) 
 		{
 			System.out.println("Action Performed");
 		}
+		
 	}
 	
 	class InversionListener implements ActionListener{
