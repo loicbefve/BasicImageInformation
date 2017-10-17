@@ -4,10 +4,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
 public class ImageViewer extends JFrame /*implements ActionListener*/
 {
@@ -56,17 +59,41 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		});
 		this.fileMenu.add(itemClose);  
 		
+		//--------------------------------------------
+		
 		itemSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//faire ce que je veux
+				saveImage("test.png");
 			}
 		});
 		this.fileMenu.add(itemSave);
+		
+		//--------------------------------------------
 		
 		this.menuBar.add(fileMenu);
 		this.setJMenuBar(menuBar);
 
 		this.setVisible(true);
+		
+	}		
+		//--------------------------------------------
+		public Boolean saveImage(String name)
+		{
+			Boolean b = false;
+			try
+			{
+	    		b = ImageIO.write(ouputImage.getImage(), "png", new File(name));
+			}
+	    	catch (IOException e) {
+	    		e.printStackTrace();
+	    	}
+			
+			return b;
+		}
+		//--------------------------------------------
+		
+		
+		
 	}
 
 	/**
@@ -78,4 +105,3 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 			System.out.println("Action Performed");
 		}
 	}
-}
