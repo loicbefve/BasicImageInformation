@@ -119,12 +119,9 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		            imageOutput.setRGB(i, j, rgb);
 		            
 		            ouputImage.image = imageOutput;
-		            output.repaint();
-		            		            
-		            
-		 
 		        }
 		    }
+			output.repaint();
 		}
 	}
 	
