@@ -6,8 +6,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import org.jfree.chart.*; 
 import org.jfree.chart.plot.*; 
-import org.jfree.data.statistics.HistogramDataset; 
-import org.jfree.data.general.AbstractDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 

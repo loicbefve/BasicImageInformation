@@ -12,12 +12,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.awt.image.BufferedImag
+import java.awt.image.BufferedImage;
 
 public class ImageViewer extends JFrame /*implements ActionListener*/
 {
+	
+	private static final long serialVersionUID = -2477005586868977725L;
 	private DisplayedImage inputImage = new DisplayedImage(); 
-	private DisplayedImage ouputImage = new DisplayedImage();
+	private DisplayedImage outputImage = new DisplayedImage();
 	private JButton buttonAction = new JButton("Action");
 	private JButton buttonHisto = new JButton("Histogramme");
 	private JButton buttonInversion = new JButton("Inversion");
@@ -40,6 +42,10 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		input.setLayout(new BoxLayout(input, BoxLayout.PAGE_AXIS));
 		input.add(inputImage);
 		
+		//Image de sortie
+		output.setLayout(new BoxLayout(output, BoxLayout.PAGE_AXIS));
+		output.add(outputImage); 
+		
 		//Bouton1
 		JPanel action = new JPanel();
 		action.setLayout(new BoxLayout(action, BoxLayout.PAGE_AXIS));
@@ -56,13 +62,10 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		
 		// Defines action associated to buttons
 		buttonAction.addActionListener(new ButtonListener());
-		buttonHisto.addActionListener(new Histolistener(ouputImage));
+		buttonHisto.addActionListener(new Histolistener(outputImage));
 		buttonInversion.addActionListener(new InversionListener());
 		
-		//Image de sortie
-		output.setLayout(new BoxLayout(output, BoxLayout.PAGE_AXIS));
-		output.add(ouputImage); 
-
+		//Fenêtre globale
 		JPanel global = new JPanel();
 		global.setLayout(new BoxLayout(global, BoxLayout.LINE_AXIS));
 		global.add(input);
@@ -70,10 +73,9 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		global.add(histo);
 		global.add(inversion);
 		global.add(output);
-
 		this.getContentPane().add(global);
 
-		this.fileMenu.addSeparator();
+		//Menu -> Exit
 		itemClose.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				System.exit(0);
@@ -81,42 +83,34 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		});
 		this.fileMenu.add(itemClose);  
 		
-		//--------------------------------------------
-		
-		itemSave.addActionListener(new ActionListener() {
+		//Menu -> Save
+		itemSave.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				saveImage("test.png");
+				saveImage("save.png");
 			}
 		});
 		this.fileMenu.add(itemSave);
 		
-		//--------------------------------------------
-		
+		//Config menu
 		this.menuBar.add(fileMenu);
 		this.setJMenuBar(menuBar);
-
-		this.setVisible(true);
-		
+		this.setVisible(true);	
 	}		
-		//--------------------------------------------
-		public Boolean saveImage(String name)
+
+	public Boolean saveImage(String name)
+	{
+		Boolean b = false;
+		try
 		{
-			Boolean b = false;
-			try
-			{
-	    		b = ImageIO.write(ouputImage.getImage(), "png", new File(name));
-			}
-	    	catch (IOException e) {
-	    		e.printStackTrace();
-	    	}
-			
-			return b;
+    		b = ImageIO.write(outputImage.getImage(), "png", new File(name));
 		}
-		//--------------------------------------------
+    	catch (IOException e) {
+    		e.printStackTrace();
+    	}
 		
-		
-		
+		return b;
 	}
+
 
 	/**
 	 * Class listening to a given button
@@ -162,13 +156,11 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		             
 		            //Je modifie l'output
 		            imageOutput.setRGB(i, j, rgb);
-		            
-		            ouputImage.image = imageOutput;
 		        }
 		    }
+			outputImage.image = imageOutput;
 			output.repaint();
 		}
 	}
 	
-
 }
