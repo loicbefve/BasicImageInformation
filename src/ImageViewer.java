@@ -4,12 +4,15 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.awt.image.BufferedImag
 
 public class ImageViewer extends JFrame /*implements ActionListener*/
 {
@@ -23,6 +26,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private JMenu fileMenu = new JMenu("File");
 
 	private JMenuItem itemClose = new JMenuItem("Close");
+	private JMenuItem itemSave = new JMenuItem("Save");
 	
 	private JPanel output = new JPanel();
 
@@ -76,11 +80,42 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 			}        
 		});
 		this.fileMenu.add(itemClose);  
-
+		
+		//--------------------------------------------
+		
+		itemSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				saveImage("test.png");
+			}
+		});
+		this.fileMenu.add(itemSave);
+		
+		//--------------------------------------------
+		
 		this.menuBar.add(fileMenu);
 		this.setJMenuBar(menuBar);
 
 		this.setVisible(true);
+		
+	}		
+		//--------------------------------------------
+		public Boolean saveImage(String name)
+		{
+			Boolean b = false;
+			try
+			{
+	    		b = ImageIO.write(ouputImage.getImage(), "png", new File(name));
+			}
+	    	catch (IOException e) {
+	    		e.printStackTrace();
+	    	}
+			
+			return b;
+		}
+		//--------------------------------------------
+		
+		
+		
 	}
 
 	/**
@@ -95,7 +130,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		}
 		
 	}
-	
+
 	class InversionListener implements ActionListener{
 		public void actionPerformed(ActionEvent arg0)
 		{
