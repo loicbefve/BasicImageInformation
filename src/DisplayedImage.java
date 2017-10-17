@@ -7,10 +7,11 @@ import javax.swing.JPanel;
  
 public class DisplayedImage extends JPanel {
 	
-    private BufferedImage image;
+    BufferedImage image;
     
     public DisplayedImage() {
     		try {
+    			//Lecture de l'image et stockage dans un BufferedImage
     			image = ImageIO.read(new File("img.png"));
         	} catch (IOException e) {
         		e.printStackTrace();
