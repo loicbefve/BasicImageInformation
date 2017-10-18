@@ -114,11 +114,10 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	class InversionListener implements ActionListener{
 		public void actionPerformed(ActionEvent arg0)
 		{
-			BufferedImage imageInput = inputImage.image;
-			BufferedImage imageOutput = imageInput;
-			
+			BufferedImage imageInput = outputImage.getImage();
 			int width = imageInput.getWidth();
 			int height = imageInput.getHeight();
+			BufferedImage imageOutput = new BufferedImage(width,height,1);
 			
 			for (int i = 0; i < width; i++) {
 		        for (int j = 0; j < height; j++) {
@@ -144,7 +143,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		            imageOutput.setRGB(i, j, rgb);
 		        }
 		    }
-			outputImage.image = imageOutput;
+			outputImage.setImage(imageOutput);
 			output.repaint();
 		}
 	}
