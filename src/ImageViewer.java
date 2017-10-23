@@ -3,11 +3,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 
 import java.awt.Color;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -30,16 +33,18 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 
 	private JMenuItem itemClose = new JMenuItem("Close");
 	private JMenuItem itemSave = new JMenuItem("Save");
+	private JMenuItem itemLoad = new JMenuItem("Load");
 	
 	private JPanel output = new JPanel();
-
+	private JPanel input = new JPanel();
+	
 	public ImageViewer () {
 		this.setTitle("Image Viewer");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(1000, 400);
 		
 		//Image d'entrée
-		JPanel input = new JPanel();
+		
 		input.setLayout(new BoxLayout(input, BoxLayout.PAGE_AXIS));
 		input.add(inputImage);
 		
@@ -86,6 +91,14 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		});
 		this.fileMenu.add(itemSave);
 		
+		//Menu -> Load
+		itemLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				loadImage();
+			}
+		});
+		this.fileMenu.add(itemLoad);
+		
 		//Config menu
 		this.menuBar.add(fileMenu);
 		this.setJMenuBar(menuBar);
@@ -105,6 +118,34 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		
 		return b;
 	}
+	
+	public void loadImage() {
+		JFileChooser chooser = new JFileChooser();
+	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+	        "JPG, PNG & GIF Images", "jpg", "gif", "png");
+	    chooser.setFileFilter(filter);
+	    try
+	    {
+	    	int returnVal = chooser.showOpenDialog(ImageViewer.this);
+	    	if(returnVal == JFileChooser.APPROVE_OPTION) {
+	    		try
+	    		{
+	    			inputImage.setImage(ImageIO.read( chooser.getSelectedFile() ));
+	    			input.repaint();
+	    			outputImage.setImage(ImageIO.read( chooser.getSelectedFile() ));
+	    			output.repaint();
+	    		}
+	    		catch (IOException e) {
+	        		e.printStackTrace();
+	        	}    
+	    	}
+	    }
+	    catch (HeadlessException e)
+	    {
+	    	e.printStackTrace();
+	    }
+	}
+	
 
 
 	/**
