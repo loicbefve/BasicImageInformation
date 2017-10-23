@@ -23,7 +23,7 @@ public class App
 	li.add(p2);
 	li.add(p3);
 	li.add(p4);
-	KdTree tree = new KdTree( li , 2 , 0);
+	KdTree tree = new KdTree( li , 2 );
 	boolean rech = tree.recherche( 7 , 1);
 	System.out.println(rech);
     }

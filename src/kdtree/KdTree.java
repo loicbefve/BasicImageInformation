@@ -138,8 +138,8 @@ public class KdTree {
 	}
 	
 	
-	public KdTree( List<Point> listePoints , int k , int profondeur) {
-		this.racine = createKdTree( listePoints , k , profondeur );
+	public KdTree( List<Point> listePoints , int k ) {
+		this.racine = createKdTree( listePoints , k , 0 );
 	}
 	
 	private KdNode algoRecherche( KdNode noeudDepart, int coordCherch , int direction) {
