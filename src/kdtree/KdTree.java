@@ -10,7 +10,61 @@ public class KdTree {
 			valeur=v;
 		}
 	}
-	
+	public String toString(){
+		int profondeur=3;
+		int parcours=0;
+		String[] cote={"D","G"};
+		boolean n=false;
+		for(int p=0;p<profondeur;p++){
+			
+			parcours=0;
+			KdNode r=racine;
+			String str="";
+			for(int j=0;j<(1<<p);j++){//pour les 2^p noeuds
+				
+				for(int i=0;i<p;i++){//on selectionne le bon noeud
+					if((parcours & (1<<i))==0){
+						if(r.filsDroit==null){
+							n=true;
+							
+						}
+						else{
+							r=r.filsDroit;
+						}
+					
+					}
+					else{
+						if(r.filsGauche==null){
+							n=true;
+							
+						}
+						else{
+							r=r.filsGauche;
+						}
+						
+					}
+					str+="\t\t";
+			
+				}
+				System.out.print(str);
+				if(n){
+					n=false;
+					System.out.println(cote[j%2]+": null");
+				}
+				else{
+					System.out.println(cote[j%2]+": "+r);
+				}
+				r=racine;
+				str="";
+				parcours++;
+			}
+			
+			
+		}
+		String res="";
+		return res;
+		
+	}
 	private class KdNode {
 			
 			private KdNode filsDroit;
@@ -21,18 +75,9 @@ public class KdTree {
 			// TODO créer classe point
 			
 			public String toString() {
-				String res="Point:"+this.point;
-				if(this.isTerminal()) {
-					res +=", Terminal";
-				}
-				if(this.filsDroit != null) {
-					res+="; filsDroit:"+this.filsDroit;
-				}
-				if(this.filsDroit != null) {
-					res +="; filsGauche:"+this.filsGauche;
-				}
+				String res="p:"+this.point;
 				if(this.direction != -1) {
-					res+= ", Direction"+this.direction;
+					res+= "Di:"+this.direction;
 				}
 				return res;
 			}
@@ -172,7 +217,7 @@ public class KdTree {
 		this.racine = createKdTree( listePoints , k , 0 );
 	}
 	
-	public String toString() {
+	/*public String toString() {
 		String res="";
 		if(this.racine.isTerminal()) {
 			res+=racine;
@@ -185,7 +230,7 @@ public class KdTree {
 			res+=racine.filsGauche;
 		}
 		return res;	
-	}
+	}*/
 	
 	private KdNode algoRecherche( KdNode noeudDepart, KdNode noeudCherch ) {
 		int direction = noeudDepart.direction;
