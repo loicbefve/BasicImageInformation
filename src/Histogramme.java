@@ -1,6 +1,4 @@
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -9,7 +7,7 @@ import org.jfree.chart.plot.*;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 
-public final class Histogramme{
+public class Histogramme{
 	
 	public static int max(int a,int b, int c){
 		if(a>=b && a>=c){
@@ -24,9 +22,9 @@ public final class Histogramme{
 		return c;
 	}
 	
-	public static void createHisto(DisplayedImage image){
+	public static void createHisto(BufferedImage im){
 		
-		BufferedImage im=image.getImage();
+		
 		int h=im.getHeight();
 		int w=im.getWidth();
 		int R=0;int V=0;int B=0;

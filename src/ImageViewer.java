@@ -6,13 +6,10 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
-
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.awt.image.BufferedImage;
 
 public class ImageViewer extends JFrame /*implements ActionListener*/
 {
@@ -110,40 +107,11 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	/**
 	 * Class listening to a given button
 	 */
-	// TODO faire la construction à part
+
 	class InversionListener implements ActionListener{
 		public void actionPerformed(ActionEvent arg0)
 		{
-			BufferedImage imageInput = outputImage.getImage();
-			int width = imageInput.getWidth();
-			int height = imageInput.getHeight();
-			BufferedImage imageOutput = new BufferedImage(width,height,1);
-			
-			for (int i = 0; i < width; i++) {
-		        for (int j = 0; j < height; j++) {
-		         
-		        	//Je récupère la couleur de chaque pixel
-		            Color pixelcolor= new Color(imageInput.getRGB(i, j));
-		             
-		            //Je récupère chaque composante
-		            int r=pixelcolor.getRed();
-		            int g=pixelcolor.getGreen();
-		            int b=pixelcolor.getBlue();
-		             
-		            //J'inverse les couleurs
-		            r=Math.abs(r-255);
-		            g=Math.abs(g-255);
-		            b=Math.abs(b-255);
-		            
-		            //Je repasse en int
-		            Color rgbNew = new Color(r,g,b);
-		            int rgb = rgbNew.getRGB();
-		             
-		            //Je modifie l'output
-		            imageOutput.setRGB(i, j, rgb);
-		        }
-		    }
-			outputImage.setImage(imageOutput);
+			outputImage.setImage(Inversion.inversion(outputImage.getImage()));
 			output.repaint();
 		}
 	}
@@ -152,8 +120,8 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		
 		
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-			Histogramme.createHisto(outputImage);
+			
+			Histogramme.createHisto(outputImage.getImage());
 		}
 	}
 	
