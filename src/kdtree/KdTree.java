@@ -10,12 +10,14 @@ public class KdTree {
 			valeur=v;
 		}
 	}
+	
 	private class KdNode {
 			
 			private KdNode filsDroit;
 			private KdNode filsGauche;
 			private int direction;
 			private Point point;
+
 			// TODO créer classe point
 			
 			public String toString() {
@@ -34,6 +36,7 @@ public class KdTree {
 				}
 				return res;
 			}
+
 			public KdNode( KdNode filsGauche , KdNode filsDroit , Point point , int direction ){
 				this.filsDroit = filsDroit;
 				this.filsGauche = filsGauche;
@@ -43,14 +46,14 @@ public class KdTree {
 			
 			public KdNode(Point point){
         
-         this.direction=-1; 
-				 this.filsDroit=null;
-         this.filsGauche=null;
-         this.point = point;
+				this.direction=-1; 
+				this.filsDroit=null;
+				this.filsGauche=null;
+				this.point = point;
   
 			}
 			
-			@SuppressWarnings("unused")
+			
 			public boolean isTerminal(){
 				return (filsDroit==null && filsGauche==null);
 			}
@@ -244,33 +247,41 @@ public class KdTree {
 		
 		
 		KdNode startNode=new KdNode(point);
-		Int distance=new Int(distsq(racine,startNode));
+		//Int distance=new Int(distsq(racine,startNode));
 		
-		return getNearestNeighbor(racine,startNode,distance).point;
+		return getNearestNeighbor(racine,startNode).point;
 		
 	} 
 		
-	private KdNode getNearestNeighbor(KdNode pere,KdNode node, Int distance){
+	private KdNode getNearestNeighbor(KdNode pere,KdNode node/*, Int distance*/){
 		
-		int D=distsq(pere,node);
+		/*int D=distsq(pere,node);//distance minimale juste comme ca pas necessaire si on s'arrete toujours au fond
 		if(distance.valeur>D){
 			distance.valeur=D;
 		}
-		
+		*/
 		if(pere.isTerminal()){
 			return pere;
 		}
-		int d=pere.point.coord[pere.direction]-node.point.coord[pere.direction];
+
+		int d=pere.point.coord[pere.direction]-node.point.coord[pere.direction];//distance par rapport a l'hyperplan
+
 		if(d>0){
 			
-			if(distsq(node,pere.filsDroit)<=d*d){//si le fils est plus proche du point que la limite de l'hyperplan
+			if(pere.filsDroit!=null && distsq(node,pere.filsDroit)<=d*d){
+			//si le fils est plus proche du point que la limite de l'hyperplan
 				
-				return getNearestNeighbor(pere.filsDroit,node,distance);
+				return getNearestNeighbor(pere.filsDroit,node);
+			}
+			else if(pere.filsDroit==null){
+			//fils gauche n'est pas null car pere n'est pas terminal
+				return getNearestNeighbor(pere.filsGauche,node);
 			}
 			else{
+			//sinon on doit regarder des deux cotes et on retourne le plus proche
 				
-				KdNode a=getNearestNeighbor(pere.filsDroit,node,distance);
-				KdNode b=getNearestNeighbor(pere.filsGauche,node,distance);
+				KdNode a=getNearestNeighbor(pere.filsDroit,node);
+				KdNode b=getNearestNeighbor(pere.filsGauche,node);
 				
 				if(distsq(a,node)<distsq(b,node)){
 					return a;
@@ -279,14 +290,19 @@ public class KdTree {
 			}
 		}
 		else{
-			if(distsq(node,pere.filsDroit)<=d*d){//si le fils est plus proche du point que la limite de l'hyperplan
+			if(pere.filsGauche!=null && distsq(node,pere.filsGauche)<=d*d){
+			//si le fils est plus proche du point que la limite de l'hyperplan
 				
-				return getNearestNeighbor(pere.filsGauche,node,distance);
+				return getNearestNeighbor(pere.filsGauche,node);
+			}
+			else if(pere.filsGauche==null){
+				
+				return getNearestNeighbor(pere.filsDroit,node);
 			}
 			else{
 				
-				KdNode a=getNearestNeighbor(pere.filsDroit,node,distance);
-				KdNode b=getNearestNeighbor(pere.filsGauche,node,distance);
+				KdNode a=getNearestNeighbor(pere.filsDroit,node);
+				KdNode b=getNearestNeighbor(pere.filsGauche,node);
 				
 				if(distsq(a,node)<distsq(b,node)){
 					return a;
