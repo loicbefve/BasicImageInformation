@@ -1,6 +1,7 @@
 package kdtree;
 
 public class Point {
+
 	int dim = 0;
 	int coord[];
 	
@@ -14,3 +15,6 @@ public class Point {
 	}
 }
 
+
+	
+	
