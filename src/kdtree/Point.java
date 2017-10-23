@@ -1,18 +1,20 @@
 package kdtree;
 
 public class Point {
-	
-	public int dim;
-	public int[] coords;
-	public Point(int ... _coords){
-		
-		dim=_coords.length;
-		
-		for(int i=0;i<dim;i++){
-			
-			coords[i]=_coords[i];
-			
-		}
-	}
 
+	int dim = 0;
+	int coord[];
+	
+	public Point( int...is ) {
+		this.coord = is;
+		this.dim = is.length;
+	}
+	
+	public int getCoord( int dim ) {
+		return this.coord[dim];
+	}
 }
+
+
+	
+	
