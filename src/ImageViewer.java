@@ -110,7 +110,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	/**
 	 * Class listening to a given button
 	 */
-
+	// TODO faire la construction à part
 	class InversionListener implements ActionListener{
 		public void actionPerformed(ActionEvent arg0)
 		{
