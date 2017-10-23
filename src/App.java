@@ -18,11 +18,11 @@ public class App
 	Point p2 = new Point(3,30);
 	Point p3 = new Point(1,7);
 	Point p4 = new Point(6,3);
+	
 	List<Point> li = new ArrayList<Point>();
-	li.add(p1);
-	li.add(p2);
-	li.add(p3);
-	li.add(p4);
+	for(int i=0;i<30;i++){
+		li.add(new Point((int)(Math.random()*100),(int)(Math.random()*100)));
+	}
 	KdTree tree = new KdTree( li , 2 );
 	System.out.println(tree);
 //	boolean rech = tree.recherche( p1 );

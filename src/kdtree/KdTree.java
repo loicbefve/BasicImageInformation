@@ -11,9 +11,9 @@ public class KdTree {
 		}
 	}
 	public String toString(){
-		int profondeur=3;
+		int profondeur=4;
 		int parcours=0;
-		String[] cote={"D","G"};
+		String chemin="";
 		boolean n=false;
 		for(int p=0;p<profondeur;p++){
 			
@@ -23,13 +23,14 @@ public class KdTree {
 			for(int j=0;j<(1<<p);j++){//pour les 2^p noeuds
 				
 				for(int i=0;i<p;i++){//on selectionne le bon noeud
-					if((parcours & (1<<i))==0){
+					if((parcours & (1<<i))==0){//permet de faire toutes les possibilités
 						if(r.filsDroit==null){
 							n=true;
 							
 						}
 						else{
 							r=r.filsDroit;
+							chemin+="D";
 						}
 					
 					}
@@ -40,6 +41,7 @@ public class KdTree {
 						}
 						else{
 							r=r.filsGauche;
+							chemin+="G";
 						}
 						
 					}
@@ -49,14 +51,15 @@ public class KdTree {
 				System.out.print(str);
 				if(n){
 					n=false;
-					System.out.println(cote[j%2]+": null");
+					System.out.println(chemin+": null");
 				}
 				else{
-					System.out.println(cote[j%2]+": "+r);
+					System.out.println(chemin+": "+r);
 				}
 				r=racine;
 				str="";
 				parcours++;
+				chemin="";
 			}
 			
 			
