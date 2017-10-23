@@ -27,6 +27,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	private DisplayedImage outputImage = new DisplayedImage();
 	
 	private JButton buttonHisto = new JButton("Histogramme");
+	private JButton buttonQuant = new JButton("Quantifie");
 	private JButton buttonInversion = new JButton("Inversion");
 
 	private JMenuBar menuBar = new JMenuBar();
@@ -63,9 +64,15 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		histo.setLayout(new BoxLayout(histo, BoxLayout.PAGE_AXIS));
 		histo.add(buttonHisto);
 		
+		//Bouton Quantifie
+		JPanel quant = new JPanel();
+		quant.setLayout(new BoxLayout(quant, BoxLayout.PAGE_AXIS));
+		quant.add(buttonQuant);
+		
 		// Defines action associated to buttons
 		buttonHisto.addActionListener(new Histolistener());
 		buttonInversion.addActionListener(new InversionListener());
+		buttonQuant.addActionListener(new Quantilistener());
 		
 		//Fenêtre globale
 		JPanel global = new JPanel();
@@ -73,6 +80,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		global.add(input);
 		global.add(histo);
 		global.add(inversion);
+		global.add(quant);
 		global.add(output);
 		this.getContentPane().add(global);
 
@@ -167,6 +175,16 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		public void actionPerformed(ActionEvent arg0) {
 			
 			Histogramme.createHisto(outputImage.getImage());
+		}
+	}
+	
+	class Quantilistener implements ActionListener {	
+		
+		
+		public void actionPerformed(ActionEvent arg0) {
+			
+			outputImage.setImage(Quantification.quantifie(outputImage.getImage()));
+			output.repaint();
 		}
 	}
 	

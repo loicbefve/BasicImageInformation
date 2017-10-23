@@ -4,78 +4,12 @@ import java.util.List;
 
 public class KdTree {
 	
-	private class Int{
-		private int valeur;
-		public Int(int v){
-			valeur=v;
-		}
-	}
-	public String toString(){
-		int profondeur=4;
-		int parcours=0;
-		String chemin="";
-		boolean n=false;
-		for(int p=0;p<profondeur;p++){
-			
-			parcours=0;
-			KdNode r=racine;
-			String str="";
-			for(int j=0;j<(1<<p);j++){//pour les 2^p noeuds
-				
-				for(int i=0;i<p;i++){//on selectionne le bon noeud
-					if((parcours & (1<<i))==0){//permet de faire toutes les possibilités
-						if(r.filsDroit==null){
-							n=true;
-							
-						}
-						else{
-							r=r.filsDroit;
-							chemin+="D";
-						}
-					
-					}
-					else{
-						if(r.filsGauche==null){
-							n=true;
-							
-						}
-						else{
-							r=r.filsGauche;
-							chemin+="G";
-						}
-						
-					}
-					str+="\t\t";
-			
-				}
-				System.out.print(str);
-				if(n){
-					n=false;
-					System.out.println(chemin+": null");
-				}
-				else{
-					System.out.println(chemin+": "+r);
-				}
-				r=racine;
-				str="";
-				parcours++;
-				chemin="";
-			}
-			
-			
-		}
-		String res="";
-		return res;
-		
-	}
 	private class KdNode {
 			
 			private KdNode filsDroit;
 			private KdNode filsGauche;
 			private int direction;
 			Point point;
-
-			// TODO créer classe point
 			
 			public String toString() {
 				String res="p:"+this.point;
@@ -83,13 +17,6 @@ public class KdTree {
 					res+= "Di:"+this.direction;
 				}
 				return res;
-			}
-
-			public KdNode( KdNode filsGauche , KdNode filsDroit , Point point , int direction ){
-				this.filsDroit = filsDroit;
-				this.filsGauche = filsGauche;
-				this.direction = direction;
-				this.point = point;
 			}
 			
 			public KdNode(Point point){
@@ -106,29 +33,64 @@ public class KdTree {
 				return (filsDroit==null && filsGauche==null);
 			}
 			
-//			public KdNode getFilsDroit() {
-//				return this.filsDroit;
-//			}
-//			
-//			public KdNode getFilsGauche() {
-//				return this.filsGauche;
-//			}
-			
-//			public int getDistance() {
-//				return this.distance;
-//			}
-			
-//			public Point getPoint() {
-//				return this.point;
-//			}
-			
-			// TODO fonction de distances
-			
 		}
 	
 	public KdNode racine;
 
-
+	public String toString(){
+		
+		int profondeur=4;
+		int parcours=0;
+		String chemin="";
+		boolean n=false;
+		
+		for(int p=0;p<profondeur;p++){
+		//on affiche les profondeurs une à une
+			parcours=0;
+			KdNode r=racine;
+			String str="";
+			for(int j=0;j<(1<<p);j++){
+			//pour les 2^p noeuds
+				for(int i=0;i<p;i++){
+					if((parcours & (1<<i))==0){
+					//permet de faire toutes les possibilités
+						if(r.filsDroit==null){
+							n=true;
+						}
+						else{
+							r=r.filsDroit;
+							chemin+="D";
+						}
+					}
+					else{
+						if(r.filsGauche==null){
+							n=true;
+						}
+						else{
+							r=r.filsGauche;
+							chemin+="G";
+						}
+					}
+					str+="\t\t";
+				}
+				System.out.print(str);
+				if(n){
+					n=false;
+					System.out.println(chemin+": null");
+				}
+				else{
+					System.out.println(chemin+": "+r);
+				}
+				r=racine;
+				str="";
+				parcours++;
+				chemin="";
+			}
+		}
+		String res="";
+		return res;
+	}
+	
 	//Tri de la liste par tri/fusion
 	private List<Point> tri( List<Point> listePoints , int direction ) {
 		int size = listePoints.size();
@@ -141,6 +103,7 @@ public class KdTree {
 			return fusion( tri(listeGauche , direction) , tri(listeDroite , direction) , direction);
 		}
 	}
+	
 	private List<Point> fusion(List<Point> listeA, List<Point> listeB , int direction) {
 		
 		if( listeA == null ) {
@@ -198,6 +161,7 @@ public class KdTree {
 		KdNode res = new KdNode(point);
 		res.direction = direction;
 		if(listePointsTriee.size() > 2) {
+			//les listes étant triees on sait qu'elles sont du bon cote
 			res.filsGauche = createKdTree(listePointsTriee.subList(0, listePointsTriee.indexOf(point)) , k , profondeur+1);
 			res.filsDroit = createKdTree(listePointsTriee.subList(listePointsTriee.indexOf(point)+1 , size) , k , profondeur+1);
 			
@@ -215,25 +179,9 @@ public class KdTree {
 		}
 	}
 	
-	
 	public KdTree( List<Point> listePoints , int k ) {
 		this.racine = createKdTree( listePoints , k , 0 );
 	}
-	
-	/*public String toString() {
-		String res="";
-		if(this.racine.isTerminal()) {
-			res+=racine;
-			return res;
-		}
-		if(this.racine.filsDroit != null){
-			res+=racine.filsDroit;
-		}
-		if(this.racine.filsGauche != null){
-			res+=racine.filsGauche;
-		}
-		return res;	
-	}*/
 	
 	private KdNode algoRecherche( KdNode noeudDepart, KdNode noeudCherch ) {
 		int direction = noeudDepart.direction;
@@ -285,31 +233,22 @@ public class KdTree {
 		return res;
 	}
 	
-
-	public Point getNearestNeighbor( Point point ) {
-		
+	public Point getNearestNeighbor( Point point ) {	
 		
 		KdNode startNode=new KdNode(point);
-		//Int distance=new Int(distsq(racine,startNode));
-		
 		return getNearestNeighbor(racine,startNode).point;
 		
 	} 
 		
-	private KdNode getNearestNeighbor(KdNode pere,KdNode node/*, Int distance*/){
+	private KdNode getNearestNeighbor(KdNode pere,KdNode node){
 		
-		/*int D=distsq(pere,node);//distance minimale juste comme ca pas necessaire si on s'arrete toujours au fond
-		if(distance.valeur>D){
-			distance.valeur=D;
-		}
-		*/
 		if(pere.isTerminal()){
 			return pere;
 		}
 
 		int d=pere.point.coord[pere.direction]-node.point.coord[pere.direction];//distance par rapport a l'hyperplan
 
-		if(d>0){
+		if(d>0){//si la distance est positive on part a droite le plus souvent
 			
 			if(pere.filsDroit!=null && distsq(node,pere.filsDroit)<=d*d){
 			//si le fils est plus proche du point que la limite de l'hyperplan
@@ -317,8 +256,12 @@ public class KdTree {
 				return getNearestNeighbor(pere.filsDroit,node);
 			}
 			else if(pere.filsDroit==null){
-			//fils gauche n'est pas null car pere n'est pas terminal
+		
 				return getNearestNeighbor(pere.filsGauche,node);
+			}
+			else if(pere.filsGauche==null){
+			
+				return getNearestNeighbor(pere.filsDroit,node);
 			}
 			else{
 			//sinon on doit regarder des deux cotes et on retourne le plus proche
@@ -332,15 +275,18 @@ public class KdTree {
 				else return b;
 			}
 		}
-		else{
+		else{//meme chose a gauche
 			if(pere.filsGauche!=null && distsq(node,pere.filsGauche)<=d*d){
-			//si le fils est plus proche du point que la limite de l'hyperplan
 				
 				return getNearestNeighbor(pere.filsGauche,node);
 			}
 			else if(pere.filsGauche==null){
 				
 				return getNearestNeighbor(pere.filsDroit,node);
+			}
+			else if(pere.filsDroit==null){
+				
+				return getNearestNeighbor(pere.filsGauche,node);
 			}
 			else{
 				
@@ -352,6 +298,30 @@ public class KdTree {
 				}
 				else return b;
 			}
+		}
+		
+	}
+
+	public void troncature(KdNode pere,int prof) {
+		
+		if(prof==0){
+			if(pere==null){
+				System.out.println("troncature ratée");
+				return;
+			}
+			pere.filsDroit=null;
+			pere.filsGauche=null;
+			return;
+		}
+		
+		else if(pere.filsGauche==null || pere.filsDroit==null){
+			System.out.println("troncature ratée");
+			
+		}
+		else{
+			troncature(pere.filsDroit,prof-1);
+			troncature(pere.filsGauche,prof-1);
+			
 		}
 		
 	}

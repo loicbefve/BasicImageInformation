@@ -13,6 +13,12 @@ public class Point {
 	public int getCoord( int dim ) {
 		return this.coord[dim];
 	}
+	
+	public void setCoord(int ...c){
+		for(int i=0;i<c.length;i++){
+			coord[i]=c[i];
+		}
+	}
 	public String toString() {
 		String ret = "(";
 		for(int i : coord) {
