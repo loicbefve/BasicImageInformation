@@ -58,7 +58,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		histo.add(buttonHisto);
 		
 		// Defines action associated to buttons
-		buttonHisto.addActionListener(new Histolistener(outputImage));
+		buttonHisto.addActionListener(new Histolistener());
 		buttonInversion.addActionListener(new InversionListener());
 		
 		//Fenêtre globale
@@ -145,6 +145,15 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		    }
 			outputImage.setImage(imageOutput);
 			output.repaint();
+		}
+	}
+	
+	class Histolistener implements ActionListener {	
+		
+		
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			Histogramme.createHisto(outputImage);
 		}
 	}
 	

@@ -9,21 +9,9 @@ import org.jfree.chart.plot.*;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 
-public class Histolistener implements ActionListener {
-
-	private DisplayedImage image;
-		
-	public Histolistener(DisplayedImage _image){
+public final class Histogramme{
 	
-		this.image=_image;
-	}
-	
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-		this.createHisto();
-	}
-	
-	public int max(int a,int b, int c){
+	public static int max(int a,int b, int c){
 		if(a>=b && a>=c){
 			
 			return a;
@@ -36,7 +24,7 @@ public class Histolistener implements ActionListener {
 		return c;
 	}
 	
-	public void createHisto(){
+	public static void createHisto(DisplayedImage image){
 		
 		BufferedImage im=image.getImage();
 		int h=im.getHeight();
