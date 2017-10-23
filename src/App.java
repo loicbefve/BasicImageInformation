@@ -25,7 +25,6 @@ public class App
 	li.add(p4);
 	KdTree tree = new KdTree( li , 2 );
 	System.out.println(tree);
-	boolean rech = tree.recherche( p1 );
-	System.out.println(rech);
+//	boolean rech = tree.recherche( p1 );
     }
 }

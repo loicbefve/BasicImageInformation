@@ -14,11 +14,11 @@ public class Point {
 		return this.coord[dim];
 	}
 	public String toString() {
-		String ret = "";
+		String ret = "(";
 		for(int i : coord) {
 			ret+= ""+i+"," ;
 		}
-		return ret;
+		return ret+")";
 	}
 }
 

@@ -16,7 +16,7 @@ public class KdTree {
 			private KdNode filsDroit;
 			private KdNode filsGauche;
 			private int direction;
-			private Point point;
+			Point point;
 
 			// TODO créer classe point
 			
@@ -32,7 +32,7 @@ public class KdTree {
 					res +="; filsGauche:"+this.filsGauche;
 				}
 				if(this.direction != -1) {
-					res+= "Direction"+this.direction;
+					res+= ", Direction"+this.direction;
 				}
 				return res;
 			}
@@ -88,8 +88,8 @@ public class KdTree {
 			return listePoints;
 		}
 		else {
-			List<Point> listeGauche = listePoints.subList(0, size/2-1);
-			List<Point> listeDroite = listePoints.subList(size/2, size-1);
+			List<Point> listeGauche = listePoints.subList(0, size/2);
+			List<Point> listeDroite = listePoints.subList(size/2, size);
 			return fusion( tri(listeGauche , direction) , tri(listeDroite , direction) , direction);
 		}
 	}
@@ -105,19 +105,18 @@ public class KdTree {
 			List<Point> ret = new ArrayList<Point>();
 			ret.add(listeA.get(0));
 			if(listeA.size() > 1) {
-				ret.addAll(fusion(listeA.subList(1, listeA.size()-1) , listeB , direction));
+				ret.addAll(fusion(listeA.subList(1, listeA.size()) , listeB , direction));
 			}
 			else {
 				ret.addAll(fusion( null , listeB , direction));
 			}
-			
 			return ret;
 		}
 		else {
 			List<Point> ret = new ArrayList<Point>();
 			ret.add(listeB.get(0));
 			if(listeB.size() > 1) {
-				ret.addAll(fusion(listeA , listeB.subList(1, listeB.size()-1) , direction));
+				ret.addAll(fusion(listeA , listeB.subList(1, listeB.size()) , direction));
 			}
 			else {
 				ret.addAll(fusion(listeA , null , direction));
@@ -144,29 +143,26 @@ public class KdTree {
 		}
 		
 		int direction = profondeur%k;
-		
 		List<Point> listePointsTriee = tri(listePoints , direction);
 		int size = listePointsTriee.size();
 		
 		Point point = mediane(listePointsTriee , direction);
+		KdNode res = new KdNode(point);
+		res.direction = direction;
 		if(listePointsTriee.size() > 2) {
-			System.out.println("grand2:");
-			KdNode filsGauche = createKdTree(listePointsTriee.subList(0, listePointsTriee.indexOf(point)-1) , k , profondeur+1);
-			KdNode filsDroit = createKdTree(listePointsTriee.subList(listePointsTriee.indexOf(point)+1 , size-1) , k , profondeur+1);
-			System.out.println(filsGauche+"  "+filsDroit);
-			KdNode res = new KdNode( filsGauche, filsDroit, point, direction);
+			res.filsGauche = createKdTree(listePointsTriee.subList(0, listePointsTriee.indexOf(point)) , k , profondeur+1);
+			res.filsDroit = createKdTree(listePointsTriee.subList(listePointsTriee.indexOf(point)+1 , size) , k , profondeur+1);
+			
 			return res;
 		}
 		else if (listePointsTriee.size() == 2){
-			KdNode filsGauche = null;
-			KdNode filsDroit = createKdTree(listePointsTriee.subList(listePointsTriee.indexOf(point)+1 , size-1) , k , profondeur+1);
-			KdNode res = new KdNode( filsGauche, filsDroit, point, direction);
+			res.filsGauche = null;
+			res.filsDroit = createKdTree(listePointsTriee.subList(listePointsTriee.indexOf(point)+1 , size) , k , profondeur+1);
 			return res;
 		}
 		else {
-			KdNode filsDroit = null;
-			KdNode filsGauche = null;
-			KdNode res = new KdNode( filsGauche, filsDroit, point, direction);
+			res.filsDroit = null;
+			res.filsGauche = null;
 			return res;
 		}
 	}
@@ -197,15 +193,12 @@ public class KdTree {
 			return noeudDepart;
 		}
 		else if(noeudCherch.point.coord[direction] > noeudDepart.point.coord[direction] && noeudDepart.filsDroit != null) {
-			System.out.println("gyg1");
 			algoRecherche(noeudDepart.filsDroit , noeudCherch);
 		}
 		else if(noeudCherch.point.coord[direction] < noeudDepart.point.coord[direction] && noeudDepart.filsGauche != null) {
-			System.out.println("gy2");
 			algoRecherche(noeudDepart.filsGauche , noeudCherch);
 		}
 		else if(noeudDepart.isTerminal() ) {
-			System.out.println("gyg");
 			return noeudDepart;
 		}
 		System.out.println("Cas non géré");
@@ -214,7 +207,9 @@ public class KdTree {
 	
 	public boolean recherche( Point point  ) {
 		KdNode noeudCherch = new KdNode(point);
-		return (algoRecherche(this.racine , noeudCherch).point == point);
+		KdNode noeudParent = algoRecherche(this.racine , noeudCherch);
+		System.out.println("Parent:"+noeudParent.point+" Point:"+point);
+		return noeudParent.point == point;
 	}
 	public void addNode( Point point ) {
 		KdNode noeudToAdd = new KdNode(point);
