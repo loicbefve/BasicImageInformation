@@ -26,13 +26,14 @@ public class KdTree {
 				this.filsGauche = filsGauche;
 				this.direction = direction;
 				this.point = point;
-
+			}
+			
 			public KdNode(Point point){
         
-         this.direction=-1; 
-				 this.filsDroit=null;
-         this.filsGauche=null;
-         this.point = point;
+				this.direction=-1; 
+				this.filsDroit=null;
+				this.filsGauche=null;
+				this.point = point;
   
 			}
 			
@@ -192,7 +193,7 @@ public class KdTree {
 		int res=0;
 		for(int i=0;i<n1.point.dim;i++){
 			
-			res+=(n1.point.coords[i]-n2.point.coords[i])*(n1.point.coords[i]-n2.point.coords[i]);
+			res+=(n1.point.coord[i]-n2.point.coord[i])*(n1.point.coord[i]-n2.point.coord[i]);
 		}
 		return res;
 	}
@@ -218,7 +219,7 @@ public class KdTree {
 		if(pere.isTerminal()){
 			return pere;
 		}
-		int d=pere.point.coords[pere.dimension]-node.point.coords[pere.dimension];
+		int d=pere.point.coord[pere.direction]-node.point.coord[pere.direction];
 		if(d>0){
 			
 			if(distsq(node,pere.filsDroit)<=d*d){//si le fils est plus proche du point que la limite de l'hyperplan
