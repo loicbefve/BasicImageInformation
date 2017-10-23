@@ -1,6 +1,4 @@
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -9,21 +7,9 @@ import org.jfree.chart.plot.*;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 
-public class Histolistener implements ActionListener {
-
-	private DisplayedImage image;
-		
-	public Histolistener(DisplayedImage _image){
+public class Histogramme{
 	
-		this.image=_image;
-	}
-	
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-		this.createHisto();
-	}
-	
-	public int max(int a,int b, int c){
+	public static int max(int a,int b, int c){
 		if(a>=b && a>=c){
 			
 			return a;
@@ -36,9 +22,9 @@ public class Histolistener implements ActionListener {
 		return c;
 	}
 	
-	public void createHisto(){
+	public static void createHisto(BufferedImage im){
 		
-		BufferedImage im=image.getImage();
+		
 		int h=im.getHeight();
 		int w=im.getWidth();
 		int R=0;int V=0;int B=0;

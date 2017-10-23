@@ -10,16 +10,32 @@ public class KdTree {
 			valeur=v;
 		}
 	}
+	
 	private class KdNode {
 			
 			private KdNode filsDroit;
 			private KdNode filsGauche;
-			@SuppressWarnings("unused")
 			private int direction;
-			@SuppressWarnings("unused")
 			private Point point;
+
 			// TODO créer classe point
 			
+			public String toString() {
+				String res="Point:"+this.point;
+				if(this.isTerminal()) {
+					res +=", Terminal";
+				}
+				if(this.filsDroit != null) {
+					res+="; filsDroit:"+this.filsDroit;
+				}
+				if(this.filsDroit != null) {
+					res +="; filsGauche:"+this.filsGauche;
+				}
+				if(this.direction != -1) {
+					res+= "Direction"+this.direction;
+				}
+				return res;
+			}
 
 			public KdNode( KdNode filsGauche , KdNode filsDroit , Point point , int direction ){
 				this.filsDroit = filsDroit;
@@ -37,7 +53,7 @@ public class KdTree {
   
 			}
 			
-			@SuppressWarnings("unused")
+			
 			public boolean isTerminal(){
 				return (filsDroit==null && filsGauche==null);
 			}
@@ -134,8 +150,10 @@ public class KdTree {
 		
 		Point point = mediane(listePointsTriee , direction);
 		if(listePointsTriee.size() > 2) {
+			System.out.println("grand2:");
 			KdNode filsGauche = createKdTree(listePointsTriee.subList(0, listePointsTriee.indexOf(point)-1) , k , profondeur+1);
 			KdNode filsDroit = createKdTree(listePointsTriee.subList(listePointsTriee.indexOf(point)+1 , size-1) , k , profondeur+1);
+			System.out.println(filsGauche+"  "+filsDroit);
 			KdNode res = new KdNode( filsGauche, filsDroit, point, direction);
 			return res;
 		}
@@ -154,35 +172,61 @@ public class KdTree {
 	}
 	
 	
-	public KdTree( List<Point> listePoints , int k , int profondeur) {
-		this.racine = createKdTree( listePoints , k , profondeur );
+	public KdTree( List<Point> listePoints , int k ) {
+		this.racine = createKdTree( listePoints , k , 0 );
 	}
 	
-	private KdNode algoRecherche( KdNode noeudDepart, int coordCherch , int direction) {
-		if( noeudDepart.point.coord[direction] == coordCherch ) {
+	public String toString() {
+		String res="";
+		if(this.racine.isTerminal()) {
+			res+=racine;
+			return res;
+		}
+		if(this.racine.filsDroit != null){
+			res+=racine.filsDroit;
+		}
+		if(this.racine.filsGauche != null){
+			res+=racine.filsGauche;
+		}
+		return res;	
+	}
+	
+	private KdNode algoRecherche( KdNode noeudDepart, KdNode noeudCherch ) {
+		int direction = noeudDepart.direction;
+		if( noeudDepart.point == noeudCherch.point ) {
 			return noeudDepart;
 		}
-		else if(coordCherch > noeudDepart.point.coord[direction] && noeudDepart.filsDroit != null) {
+		else if(noeudCherch.point.coord[direction] > noeudDepart.point.coord[direction] && noeudDepart.filsDroit != null) {
 			System.out.println("gyg1");
-			algoRecherche(noeudDepart.filsDroit , coordCherch , direction);
+			algoRecherche(noeudDepart.filsDroit , noeudCherch);
 		}
-		else if(coordCherch < noeudDepart.point.coord[direction] && noeudDepart.filsGauche != null) {
+		else if(noeudCherch.point.coord[direction] < noeudDepart.point.coord[direction] && noeudDepart.filsGauche != null) {
 			System.out.println("gy2");
-			algoRecherche(noeudDepart.filsGauche , coordCherch , direction);
+			algoRecherche(noeudDepart.filsGauche , noeudCherch);
 		}
 		else if(noeudDepart.isTerminal() ) {
 			System.out.println("gyg");
-			return null;
+			return noeudDepart;
 		}
 		System.out.println("Cas non géré");
 		return null;
 	}
 	
-	public boolean recherche(int coordCherch , int direction) {
-		return (algoRecherche(this.racine , coordCherch, direction)!=null);
+	public boolean recherche( Point point  ) {
+		KdNode noeudCherch = new KdNode(point);
+		return (algoRecherche(this.racine , noeudCherch).point == point);
 	}
-//	public void addNode( Point point ) {
-//	}
+	public void addNode( Point point ) {
+		KdNode noeudToAdd = new KdNode(point);
+		KdNode noeudParent = algoRecherche(this.racine , noeudToAdd);
+		int direction = noeudParent.direction;
+		if(point.coord[direction] < noeudParent.point.coord[direction]) {
+			noeudParent.filsGauche = noeudToAdd;
+		}
+		else if(point.coord[direction] > noeudParent.point.coord[direction]) {
+			noeudParent.filsDroit = noeudToAdd;
+		}
+	}
 	
 	// TODO : Plus tard
 //	public void removeNode ( Point point ) {
@@ -203,33 +247,41 @@ public class KdTree {
 		
 		
 		KdNode startNode=new KdNode(point);
-		Int distance=new Int(distsq(racine,startNode));
+		//Int distance=new Int(distsq(racine,startNode));
 		
-		return getNearestNeighbor(racine,startNode,distance).point;
+		return getNearestNeighbor(racine,startNode).point;
 		
 	} 
 		
-	private KdNode getNearestNeighbor(KdNode pere,KdNode node, Int distance){
+	private KdNode getNearestNeighbor(KdNode pere,KdNode node/*, Int distance*/){
 		
-		int D=distsq(pere,node);
+		/*int D=distsq(pere,node);//distance minimale juste comme ca pas necessaire si on s'arrete toujours au fond
 		if(distance.valeur>D){
 			distance.valeur=D;
 		}
-		
+		*/
 		if(pere.isTerminal()){
 			return pere;
 		}
-		int d=pere.point.coord[pere.direction]-node.point.coord[pere.direction];
+
+		int d=pere.point.coord[pere.direction]-node.point.coord[pere.direction];//distance par rapport a l'hyperplan
+
 		if(d>0){
 			
-			if(distsq(node,pere.filsDroit)<=d*d){//si le fils est plus proche du point que la limite de l'hyperplan
+			if(pere.filsDroit!=null && distsq(node,pere.filsDroit)<=d*d){
+			//si le fils est plus proche du point que la limite de l'hyperplan
 				
-				return getNearestNeighbor(pere.filsDroit,node,distance);
+				return getNearestNeighbor(pere.filsDroit,node);
+			}
+			else if(pere.filsDroit==null){
+			//fils gauche n'est pas null car pere n'est pas terminal
+				return getNearestNeighbor(pere.filsGauche,node);
 			}
 			else{
+			//sinon on doit regarder des deux cotes et on retourne le plus proche
 				
-				KdNode a=getNearestNeighbor(pere.filsDroit,node,distance);
-				KdNode b=getNearestNeighbor(pere.filsGauche,node,distance);
+				KdNode a=getNearestNeighbor(pere.filsDroit,node);
+				KdNode b=getNearestNeighbor(pere.filsGauche,node);
 				
 				if(distsq(a,node)<distsq(b,node)){
 					return a;
@@ -238,14 +290,19 @@ public class KdTree {
 			}
 		}
 		else{
-			if(distsq(node,pere.filsDroit)<=d*d){//si le fils est plus proche du point que la limite de l'hyperplan
+			if(pere.filsGauche!=null && distsq(node,pere.filsGauche)<=d*d){
+			//si le fils est plus proche du point que la limite de l'hyperplan
 				
-				return getNearestNeighbor(pere.filsGauche,node,distance);
+				return getNearestNeighbor(pere.filsGauche,node);
+			}
+			else if(pere.filsGauche==null){
+				
+				return getNearestNeighbor(pere.filsDroit,node);
 			}
 			else{
 				
-				KdNode a=getNearestNeighbor(pere.filsDroit,node,distance);
-				KdNode b=getNearestNeighbor(pere.filsGauche,node,distance);
+				KdNode a=getNearestNeighbor(pere.filsDroit,node);
+				KdNode b=getNearestNeighbor(pere.filsGauche,node);
 				
 				if(distsq(a,node)<distsq(b,node)){
 					return a;
