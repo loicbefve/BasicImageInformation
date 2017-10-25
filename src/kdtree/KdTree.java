@@ -325,6 +325,33 @@ public class KdTree {
 		}
 		
 	}
-		
 	
+	public int[] remplissage(int prof){
+
+		int palette[]=new int[1<<prof];
+		KdNode n=racine;
+		int parcours=0;int color=0;
+		for(int j=0;j<(1<<prof);j++){
+			for(int i=0;i<prof;i++){
+				if((parcours & (1<<i))==0){
+					n=n.filsDroit;
+				}
+				else{
+					n=n.filsGauche;
+				}
+			}
+			
+			for(int k=n.point.dim-1;k>=0;k--){
+				color|=(n.point.getCoord(n.point.dim-1-k)<<8*k);
+				//chaque dimension est encodée sur 8bits, l'octet de poids fort correspond a la derniere dimension
+			}
+			palette[parcours]=color;
+			parcours++;
+			color=0;
+			n=racine;
+		}
+		
+		return palette;
+	
+	}
 }
