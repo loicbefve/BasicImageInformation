@@ -30,6 +30,11 @@ public class KdTree {
 			
 			
 			public boolean isTerminal(){
+				/**
+				 * This public method returns if the node is terminal or not
+				 *
+				 * @return      a boolean true:terminal , false:not terminal
+				 */
 				return (filsDroit==null && filsGauche==null);
 			}
 			
@@ -93,6 +98,16 @@ public class KdTree {
 	
 	//Tri de la liste par tri/fusion
 	private List<Point> tri( List<Point> listePoints , int direction ) {
+		/**
+		 * Private function which returns the list of points given but 
+		 * sorted by the direction given.
+		 *
+		 * @param List<Point> listePoints: the list of point to be sorted 
+		 * @param int direction: an integer representing the coordinate of the point
+		 * which is use to sort the list
+		 * @return List<Point> ret the begining list of point sorted by direction
+		 * this function call the private function fusion recursively. 
+		 */
 		int size = listePoints.size();
 		if( size <= 1) {
 			return listePoints;
@@ -105,7 +120,6 @@ public class KdTree {
 	}
 	
 	private List<Point> fusion(List<Point> listeA, List<Point> listeB , int direction) {
-		
 		if( listeA == null ) {
 			return listeB;
 		}
@@ -137,6 +151,14 @@ public class KdTree {
 	}
 	
 	private Point mediane( List<Point> listePointsTriee , int direction) {
+		/**
+		 * Private function which returns the median point of a list of point sorted
+		 * by a direction.
+		 *
+		 * @param List<Point> listePointsTriee: the list of sorted points where we want the median
+		 * @param int direction: an integer representing the coordinate of the point that we are interresing about
+		 * @return Point: the median point af the sorted list
+		 */
 		if(listePointsTriee.size() > 0) {
 			if(listePointsTriee.size()%2 != 0) {
 				return listePointsTriee.get(listePointsTriee.size()/2);
@@ -149,6 +171,14 @@ public class KdTree {
 	}
 	
 	private KdNode createKdTree (List<Point> listePoints , int k , int profondeur) {
+		/**
+		 * Private recursive function which create a k-d tree
+		 *
+		 * @param List<Point> listePoints: the list of point of the k-d tree 
+		 * @param int k: the dimension k of the k-d tree
+		 * @param int profondeur: the stage that we are creating
+		 * @return KdNode: the root of the created k-d tree 
+		 */
 		if( listePoints.isEmpty() ) {
 			return null;
 		}
@@ -180,6 +210,12 @@ public class KdTree {
 	}
 	
 	public KdTree( List<Point> listePoints , int k ) {
+		/**
+		 * Constructor of the class k-d tree
+		 *
+		 * @param List<Point> listePoints: the list of point of the k-d tree 
+		 * @param int k: the dimension k of the k-d tree
+		 */
 		this.racine = createKdTree( listePoints , k , 0 );
 	}
 	
@@ -207,6 +243,7 @@ public class KdTree {
 		System.out.println("Parent:"+noeudParent.point+" Point:"+point);
 		return noeudParent.point == point;
 	}
+	
 	public void addNode( Point point ) {
 		KdNode noeudToAdd = new KdNode(point);
 		KdNode noeudParent = algoRecherche(this.racine , noeudToAdd);
@@ -233,15 +270,25 @@ public class KdTree {
 		return res;
 	}
 	
-	public Point getNearestNeighbor( Point point ) {	
-		
+	public Point getNearestNeighbor( Point point ) {
+		/**
+		 * public function which find the nearest neighbor of the given point
+		 *
+		 * @param Point point: The point for which we search the nearest neighbor
+		 * @return Point: The nearest neighbor of the Point point
+		 */
 		KdNode startNode=new KdNode(point);
 		return getNearestNeighbor(racine,startNode).point;
 		
 	} 
 		
 	private KdNode getNearestNeighbor(KdNode pere,KdNode node){
-		
+		/**
+		 * Private function
+		 *
+		 * @param List<Point> listePoints: the list of point of the k-d tree 
+		 * @param int k: the dimension k of the k-d tree
+		 */
 		if(pere.isTerminal()){
 			return pere;
 		}
