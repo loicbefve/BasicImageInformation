@@ -15,8 +15,13 @@ import java.awt.HeadlessException;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class ImageViewer extends JFrame /*implements ActionListener*/
 {
@@ -119,7 +124,12 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		Boolean b = false;
 		try
 		{
-    		b = ImageIO.write(outputImage.getImage(), "png", new File(name));
+			if(outputImage.getImage().getType()==0){
+				CustomImage.write(outputImage.getImage(),name);
+			}
+			else{
+				b = ImageIO.write(outputImage.getImage(), "png", new File(name));
+			}
 		}
     	catch (IOException e) {
     		e.printStackTrace();
@@ -131,23 +141,41 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	public void loadImage() {
 		JFileChooser chooser = new JFileChooser();
 	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
-	        "JPG, PNG & GIF Images", "jpg", "gif", "png");
+	        "JPG, PNG & GIF Images", "jpg", "gif", "png","cst");
 	    chooser.setFileFilter(filter);
 	    try
 	    {
 	    	int returnVal = chooser.showOpenDialog(ImageViewer.this);
 	    	if(returnVal == JFileChooser.APPROVE_OPTION) {
+	    			
 	    		try
 	    		{
-	    			inputImage.setImage(ImageIO.read( chooser.getSelectedFile() ));
-	    			input.repaint();
-	    			outputImage.setImage(ImageIO.read( chooser.getSelectedFile() ));
-	    			output.repaint();
+	    			File fichier=chooser.getSelectedFile();
+	    			InputStream flux=new FileInputStream(fichier); 
+	    			InputStreamReader lecture=new InputStreamReader(flux);
+	    			BufferedReader buff=new BufferedReader(lecture);
+	    			String a=buff.readLine();
+	    			
+	    			if(a.equals("P10")){
+	    				
+	    				inputImage.setImage(CustomImage.read(fichier));
+	    				input.repaint();
+	    				//outputImage.setImage(CustomImage.read(fichier));
+	    				//output.repaint();
+	    			}
+	    			else{
+	    				inputImage.setImage(ImageIO.read( fichier ));
+	    				input.repaint();
+	    				outputImage.setImage(ImageIO.read( fichier ));
+	    				output.repaint();
+	    			}
+	    			
 	    		}
 	    		catch (IOException e) {
 	        		e.printStackTrace();
 	        	}    
 	    	}
+	  
 	    }
 	    catch (HeadlessException e)
 	    {
@@ -183,7 +211,8 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		
 		public void actionPerformed(ActionEvent arg0) {
 			
-			outputImage.setImage(Quantification.quantifie(outputImage.getImage()));
+			
+			outputImage.setImage(Quantification.compresse(outputImage.getImage()));
 			output.repaint();
 		}
 	}
