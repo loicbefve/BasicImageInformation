@@ -8,6 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+
+import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,23 +24,27 @@ public class ImageViewer extends JFrame
 {
 	
 	private static final long serialVersionUID = -2477005586868977725L;
+
+	private static final int B_WIDTH = 200;
+	private static final int B_HEIGHT = 25;
 	
-	private DisplayedImage inputImage = new DisplayedImage(); 
+	private DisplayedImage inputImage  = new DisplayedImage(); 
 	private DisplayedImage outputImage = new DisplayedImage();
 	
-	private JButton buttonHisto = new JButton("Histogramme");
-	private JButton buttonQuant = new JButton("Quantifie");
-	private JButton buttonInversion = new JButton("Inversion");
+	private JButton buttonHisto     = new JButton("Histogramme");
+	private JButton buttonQuant     = new JButton(" Quantifie ");
+	private JButton buttonInversion = new JButton(" Inversion ");
 
 	private JMenuBar menuBar = new JMenuBar();
-	private JMenu fileMenu = new JMenu("File");
+	private JMenu fileMenu   = new JMenu("File");
 
 	private JMenuItem itemClose = new JMenuItem("Close");
-	private JMenuItem itemSave = new JMenuItem("Save");
-	private JMenuItem itemLoad = new JMenuItem("Load");
+	private JMenuItem itemSave  = new JMenuItem("Save");
+	private JMenuItem itemSaveAs= new JMenuItem("SaveAs");
+	private JMenuItem itemLoad  = new JMenuItem("Load");
 	
 	private JPanel output = new JPanel();
-	private JPanel input = new JPanel();
+	private JPanel input  = new JPanel();
 	
 	public ImageViewer () {
 		this.setTitle("Image Viewer");
@@ -53,33 +59,31 @@ public class ImageViewer extends JFrame
 		output.setLayout(new BoxLayout(output, BoxLayout.PAGE_AXIS));
 		output.add(outputImage); 
 		
+		JPanel buttons=new JPanel();
+		buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
+		
 		//BoutonInversion
-		JPanel inversion = new JPanel();
-		inversion.setLayout(new BoxLayout(inversion, BoxLayout.PAGE_AXIS));
-		inversion.add(buttonInversion);
-		
+		buttonInversion.setMaximumSize(new Dimension(B_WIDTH,B_HEIGHT));
+		buttons.add(buttonInversion);
 		//BoutonHisto
-		JPanel histo = new JPanel();
-		histo.setLayout(new BoxLayout(histo, BoxLayout.PAGE_AXIS));
-		histo.add(buttonHisto);
-		
+		buttonHisto.setMaximumSize(new Dimension(B_WIDTH,B_HEIGHT));
+		buttons.add(buttonHisto);
 		//Bouton Quantifie
-		JPanel quant = new JPanel();
-		quant.setLayout(new BoxLayout(quant, BoxLayout.PAGE_AXIS));
-		quant.add(buttonQuant);
+		buttonQuant.setMaximumSize(new Dimension(B_WIDTH,B_HEIGHT));
+		buttons.add(buttonQuant);
 		
 		// Defines action associated to buttons
 		buttonHisto.addActionListener(new Histolistener());
 		buttonInversion.addActionListener(new InversionListener());
 		buttonQuant.addActionListener(new Quantilistener());
 		
+		
+		
 		//Fenêtre globale
 		JPanel global = new JPanel();
 		global.setLayout(new BoxLayout(global, BoxLayout.LINE_AXIS));
 		global.add(input);
-		global.add(histo);
-		global.add(inversion);
-		global.add(quant);
+		global.add(buttons);
 		global.add(output);
 		this.getContentPane().add(global);
 
@@ -99,6 +103,32 @@ public class ImageViewer extends JFrame
 		});
 		this.fileMenu.add(itemSave);
 		
+		//Menu -> Save as;
+		itemSaveAs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setDialogTitle("Specify a file to save");   
+				int userSelection = fileChooser.showSaveDialog(ImageViewer.this);
+				 
+				if (userSelection == JFileChooser.APPROVE_OPTION) {
+				    File fileToSave = fileChooser.getSelectedFile();
+				    try{
+				    	fileToSave.createNewFile();
+				    	System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+					    saveImage(fileToSave.getAbsolutePath());
+				    	
+				    }
+				    catch(Exception e){
+				    	e.printStackTrace();
+				    }
+				    
+				}
+				
+				
+			}
+		});
+		this.fileMenu.add(itemSaveAs);
+		
 		//Menu -> Load
 		itemLoad.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -117,24 +147,17 @@ public class ImageViewer extends JFrame
 	{
 		Boolean b = false;
 		
-		
 		try
 		{
-			InputStream flux=new FileInputStream(name); 
-			InputStreamReader lecture=new InputStreamReader(flux);
-			BufferedReader buff=new BufferedReader(lecture);
-			String a=buff.readLine();
-			
-			if(a.equals("P10")){//si c'est une image custom
+			String[] n=name.split(".");
+
+			if(n.length==2 && n[1].equals("cst")){//si c'est une image custom avec un nom propre
 				CustomImage.write(outputImage.getImage(),name);
 			}
 			else{
 				b = ImageIO.write(outputImage.getImage(), "png", new File(name));
 			}
 			
-			buff.close();
-			lecture.close();
-			flux.close();
 		}
     	catch (IOException e) {
     		e.printStackTrace();
