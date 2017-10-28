@@ -10,12 +10,32 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import sun.awt.image.ImageFormatException;
 
+/**
+ * <p>
+ * This class contains static methods used to manage .cst images, cst images use the following encoding:
+ * 
+ * <ul>
+ * <li>The first line is a magic number "P10"</li>
+ * <li>The second line contains the dimensions : "WIDTH HEIGHT" </li>
+ * <li>The third line contains the number of bits for each pixels</li>
+ * <li>The fourth line contains the color list formated as : "0xRRGGBB 0xRRGGBB ..."</li>
+ * </ul>
+ * 
+ *	Each pixel is an index to a given color in the color list.
+ *</p>
+ *	
+ */
 
 public class CustomImage {
-	
+	/**
+	 * 
+	 * Public function which writes the data of a BufferedImage following the cst protocole
+	 * 
+	 * @param image : BufferedImage that contains the cst image to write in filename
+	 * @param filename 
+	 */
 	public static void write(BufferedImage image,String filename){
 		
 		File fichier=new File(filename);
@@ -58,6 +78,11 @@ public class CustomImage {
     	}
 	}
 	
+	/**
+	 * Public function that read a file with a given name filename and return a compatible BufferedImage
+	 * @param filename
+	 * @return a BufferedImage that represent the image stored in the file named filename
+	 */
 	public static BufferedImage read(File filename){
 		
 		String nm="",pal="",dims="",pixel_size="";
@@ -127,7 +152,11 @@ public class CustomImage {
 			return null;	
 		}
 	}
-
+	/**
+	 *  Private fontion that transforms a char into an hexadecimal value, poorly writed 
+	 * @param c
+	 * @return the associated byte
+	 */
 	private static byte chartoByte(char c) {
 	//TODO si quelqu'un trouve une meilleure solution je suis preneur 
 		switch(c){

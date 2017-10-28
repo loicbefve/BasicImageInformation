@@ -142,7 +142,11 @@ public class ImageViewer extends JFrame
 		this.setJMenuBar(menuBar);
 		this.setVisible(true);	
 	}		
-
+	/**
+	 * Public function that save an Image in the given file,
+	 * @param name
+	 * @return a boolean : true is the image has been saved, false otherwise
+	 */
 	public Boolean saveImage(String name)
 	{
 		Boolean b = false;
@@ -153,11 +157,11 @@ public class ImageViewer extends JFrame
 
 			if(n.length==2 && n[1].equals("cst")){//si c'est une image custom avec un nom propre
 				CustomImage.write(outputImage.getImage(),name);
+				b=true;
 			}
 			else{
 				b = ImageIO.write(outputImage.getImage(), "png", new File(name));
 			}
-			
 		}
     	catch (IOException e) {
     		e.printStackTrace();
@@ -165,7 +169,9 @@ public class ImageViewer extends JFrame
 		
 		return b;
 	}
-	
+	/**
+	 * Public function that load an image from a chosen file
+	 */
 	public void loadImage() {
 		
 		JFileChooser chooser = new JFileChooser();
@@ -216,12 +222,8 @@ public class ImageViewer extends JFrame
 	    }
 	}
 	
-
-
-	/**
-	 * Listener des differents boutons
-	 */
-
+	
+	/**Listener of the "inversion" button*/
 	class InversionListener implements ActionListener{
 		public void actionPerformed(ActionEvent arg0)
 		{
@@ -229,14 +231,14 @@ public class ImageViewer extends JFrame
 			output.repaint();
 		}
 	}
-	
+	/**Listener of the "histogramme" button*/
 	class Histolistener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			
 			Histogramme.createHisto(outputImage.getImage());
 		}
 	}
-	
+	/**Listener of the "quantification" button*/
 	class Quantilistener implements ActionListener {	
 		public void actionPerformed(ActionEvent arg0) {
 			

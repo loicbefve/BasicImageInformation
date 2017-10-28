@@ -7,8 +7,19 @@ import java.util.List;
 import java.awt.image.WritableRaster;
 import kdtree.*;
 
+/**
+ * <p> Class used to compress a given image 
+ * the static value L2N_COLORS is the log2 of the actual number of colors we want in the color list </p>
+ */
 public class Quantification {
 	
+	public static final int L2N_COLORS=4;
+	/**
+	 * Public static function that returns the index of a given value in an array
+	 * @param int[] palette : array of integer
+	 * @param int valeur 
+	 * @return the index if it is in, -1 otherwise
+	 */
 	public static int getIndex(int[] palette, int valeur){
 	//fonction qui permet de retrouve l'index d'une couleur dans la palette, -1 si pas dans la palette
 		for(int i=0;i<palette.length;i++){
@@ -18,7 +29,11 @@ public class Quantification {
 		}
 		return -1;
 	}
-	
+	/**
+	 * Public static function that compress a given image. It indexes each pixel in an array of colors with a given size
+	 * @param image
+	 * @return a compressed BufferedImage
+	 */
 	public static BufferedImage compresse(BufferedImage image){
 		
 		List<Point> listePoints =new ArrayList<Point>();//liste des pixels de l'image
@@ -36,8 +51,8 @@ public class Quantification {
 		}
 		
 		KdTree tree_palette=new KdTree(listePoints,3);
-		tree_palette.troncature(tree_palette.racine,4);//on aura 
-		int palette[]=tree_palette.remplissage(4);//on recupere les couleurs sous forme 0xRRVVBB
+		tree_palette.troncature(tree_palette.racine,L2N_COLORS);
+		int palette[]=tree_palette.remplissage(L2N_COLORS);//on recupere les couleurs sous forme 0xRRVVBB
 		
 		Point p=new Point(0,0,0);
 		Point g;
