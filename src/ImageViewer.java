@@ -8,22 +8,17 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
-
-
-import java.awt.Color;
 import java.awt.HeadlessException;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class ImageViewer extends JFrame /*implements ActionListener*/
+public class ImageViewer extends JFrame
 {
 	
 	private static final long serialVersionUID = -2477005586868977725L;
@@ -51,7 +46,6 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		this.setSize(1000, 400);
 		
 		//Image d'entrée
-		
 		input.setLayout(new BoxLayout(input, BoxLayout.PAGE_AXIS));
 		input.add(inputImage);
 		
@@ -122,14 +116,25 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	public Boolean saveImage(String name)
 	{
 		Boolean b = false;
+		
+		
 		try
 		{
-			if(outputImage.getImage().getType()==0){
+			InputStream flux=new FileInputStream(name); 
+			InputStreamReader lecture=new InputStreamReader(flux);
+			BufferedReader buff=new BufferedReader(lecture);
+			String a=buff.readLine();
+			
+			if(a.equals("P10")){//si c'est une image custom
 				CustomImage.write(outputImage.getImage(),name);
 			}
 			else{
 				b = ImageIO.write(outputImage.getImage(), "png", new File(name));
 			}
+			
+			buff.close();
+			lecture.close();
+			flux.close();
 		}
     	catch (IOException e) {
     		e.printStackTrace();
@@ -139,10 +144,12 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	}
 	
 	public void loadImage() {
+		
 		JFileChooser chooser = new JFileChooser();
 	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
-	        "JPG, PNG & GIF Images", "jpg", "gif", "png","cst");
+	        "JPG, PNG & GIF Images", "jpg", "gif", "png","cst");//cst pour custom
 	    chooser.setFileFilter(filter);
+	    
 	    try
 	    {
 	    	int returnVal = chooser.showOpenDialog(ImageViewer.this);
@@ -151,6 +158,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	    		try
 	    		{
 	    			File fichier=chooser.getSelectedFile();
+	    			
 	    			InputStream flux=new FileInputStream(fichier); 
 	    			InputStreamReader lecture=new InputStreamReader(flux);
 	    			BufferedReader buff=new BufferedReader(lecture);
@@ -159,23 +167,25 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	    			if(a.equals("P10")){
 	    				
 	    				inputImage.setImage(CustomImage.read(fichier));
-	    				input.repaint();
-	    				//outputImage.setImage(CustomImage.read(fichier));
-	    				//output.repaint();
+	    				outputImage.setImage(CustomImage.read(fichier));
 	    			}
 	    			else{
-	    				inputImage.setImage(ImageIO.read( fichier ));
-	    				input.repaint();
-	    				outputImage.setImage(ImageIO.read( fichier ));
-	    				output.repaint();
+	    				inputImage.setImage(ImageIO.read(fichier));
+	    				outputImage.setImage(ImageIO.read(fichier));
 	    			}
 	    			
+	    			input.repaint();
+	    			output.repaint();
+	    			
+	    			buff.close();
+	    			lecture.close();
+	    			flux.close();
+	  
 	    		}
 	    		catch (IOException e) {
 	        		e.printStackTrace();
 	        	}    
 	    	}
-	  
 	    }
 	    catch (HeadlessException e)
 	    {
@@ -186,7 +196,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 
 
 	/**
-	 * Class listening to a given button
+	 * Listener des differents boutons
 	 */
 
 	class InversionListener implements ActionListener{
@@ -197,9 +207,7 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 		}
 	}
 	
-	class Histolistener implements ActionListener {	
-		
-		
+	class Histolistener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			
 			Histogramme.createHisto(outputImage.getImage());
@@ -207,14 +215,10 @@ public class ImageViewer extends JFrame /*implements ActionListener*/
 	}
 	
 	class Quantilistener implements ActionListener {	
-		
-		
 		public void actionPerformed(ActionEvent arg0) {
-			
 			
 			outputImage.setImage(Quantification.compresse(outputImage.getImage()));
 			output.repaint();
 		}
 	}
-	
 }
