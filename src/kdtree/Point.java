@@ -15,6 +15,7 @@ public class Point {
 	}
 	
 	public void setCoord(int ...c){
+		assert(c.length == this.dim);
 		for(int i=0;i<c.length;i++){
 			coord[i]=c[i];
 		}
