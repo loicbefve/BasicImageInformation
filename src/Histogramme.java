@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import org.jfree.chart.*; 
 import org.jfree.chart.plot.*; 
 import org.jfree.data.category.DefaultCategoryDataset;
+import java.awt.Color;
 
 
 public class Histogramme{

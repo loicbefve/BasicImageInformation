@@ -137,12 +137,13 @@ public class ImageViewer extends JFrame
 		this.setJMenuBar(menuBar);
 		this.setVisible(true);	
 	}		
+	
+	public Boolean saveImage(String name)
 	/**
 	 * Public function that save an Image in the given file,
 	 * @param name
 	 * @return a boolean : true is the image has been saved, false otherwise
 	 */
-	public Boolean saveImage(String name)
 	{
 		Boolean b = false;
 		
@@ -166,11 +167,11 @@ public class ImageViewer extends JFrame
 		
 		return b;
 	}
-	/**
-	 * Public function that load an image from a chosen file
-	 */
+	
 	public void loadImage() {
-		
+		/**
+		 * Public function that load an image from a chosen file
+		 */
 		JFileChooser chooser = new JFileChooser();
 	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
 	        "JPG, PNG & GIF Images", "jpg", "gif", "png","cst");//cst pour custom
@@ -209,23 +210,26 @@ public class ImageViewer extends JFrame
 	}
 	
 	
-	/**Listener of the "inversion" button*/
+	
 	class InversionListener implements ActionListener{
+		/**Listener of the "inversion" button*/
 		public void actionPerformed(ActionEvent arg0)
 		{
 			outputImage.setImage(Inversion.inversion(outputImage.getImage()));
 			output.repaint();
 		}
 	}
-	/**Listener of the "histogramme" button*/
+	
 	class Histolistener implements ActionListener {
+		/**Listener of the "histogramme" button*/
 		public void actionPerformed(ActionEvent arg0) {
 			
 			Histogramme.createHisto(outputImage.getImage());
 		}
 	}
-	/**Listener of the "quantification" button*/
-	class Quantilistener implements ActionListener {	
+	
+	class Quantilistener implements ActionListener {
+		/**Listener of the "quantification" button*/
 		public void actionPerformed(ActionEvent arg0) {
 			
 			outputImage.setImage(Quantification.compresse(outputImage.getImage()));
