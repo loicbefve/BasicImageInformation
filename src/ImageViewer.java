@@ -8,17 +8,11 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
-
 import java.awt.Dimension;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
 
 public class ImageViewer extends JFrame
 {
@@ -46,11 +40,13 @@ public class ImageViewer extends JFrame
 	private JPanel output = new JPanel();
 	private JPanel input  = new JPanel();
 	
+	
+	
 	public ImageViewer () {
 		this.setTitle("Image Viewer");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(1000, 400);
-		
+
 		//Image d'entrée
 		input.setLayout(new BoxLayout(input, BoxLayout.PAGE_AXIS));
 		input.add(inputImage);
@@ -114,9 +110,8 @@ public class ImageViewer extends JFrame
 				    File fileToSave = fileChooser.getSelectedFile();
 				    try{
 				    	fileToSave.createNewFile();
-				    	System.out.println("Save as file: " + fileToSave.getAbsolutePath());
 					    saveImage(fileToSave.getAbsolutePath());
-				    	
+					    System.out.println("Save as file: " + fileToSave.getAbsolutePath());
 				    }
 				    catch(Exception e){
 				    	e.printStackTrace();
@@ -153,17 +148,19 @@ public class ImageViewer extends JFrame
 		
 		try
 		{
-			String[] n=name.split(".");
-
+			
+			String[] n=name.split("\\.");
+			
 			if(n.length==2 && n[1].equals("cst")){//si c'est une image custom avec un nom propre
 				CustomImage.write(outputImage.getImage(),name);
+				System.out.println("Format cst");
 				b=true;
 			}
 			else{
 				b = ImageIO.write(outputImage.getImage(), "png", new File(name));
 			}
 		}
-    	catch (IOException e) {
+    	catch (Exception e) {
     		e.printStackTrace();
     	}
 		
@@ -184,42 +181,31 @@ public class ImageViewer extends JFrame
 	    	int returnVal = chooser.showOpenDialog(ImageViewer.this);
 	    	if(returnVal == JFileChooser.APPROVE_OPTION) {
 	    			
-	    		try
-	    		{
-	    			File fichier=chooser.getSelectedFile();
-	    			
-	    			InputStream flux=new FileInputStream(fichier); 
-	    			InputStreamReader lecture=new InputStreamReader(flux);
-	    			BufferedReader buff=new BufferedReader(lecture);
-	    			String a=buff.readLine();
-	    			
-	    			if(a.equals("P10")){
+	    		
+	    		File fichier=chooser.getSelectedFile();
+	    		String name=fichier.getName();
+	    		String[] n=name.split("\\.");
+	    		if(n.length==2 && n[1].equals("cst")){
 	    				
-	    				inputImage.setImage(CustomImage.read(fichier));
-	    				outputImage.setImage(CustomImage.read(fichier));
-	    			}
-	    			else{
-	    				inputImage.setImage(ImageIO.read(fichier));
-	    				outputImage.setImage(ImageIO.read(fichier));
-	    			}
-	    			
-	    			input.repaint();
-	    			output.repaint();
-	    			
-	    			buff.close();
-	    			lecture.close();
-	    			flux.close();
-	  
+	    			inputImage.setImage(CustomImage.read(fichier));
+	    			outputImage.setImage(CustomImage.read(fichier));
 	    		}
-	    		catch (IOException e) {
-	        		e.printStackTrace();
-	        	}    
+	    		else{
+	    				
+	    			inputImage.setImage(ImageIO.read(fichier));
+	    			outputImage.setImage(ImageIO.read(fichier));
+	    		}
+	    			
+	    		input.repaint();
+	    		output.repaint();
 	    	}
 	    }
-	    catch (HeadlessException e)
-	    {
-	    	e.printStackTrace();
-	    }
+	    catch (Exception e) {
+	    			
+	        e.printStackTrace();
+	    }    
+	    	
+	    
 	}
 	
 	

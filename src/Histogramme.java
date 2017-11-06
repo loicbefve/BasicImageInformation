@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -31,10 +32,12 @@ public class Histogramme{
 		int nR=0;int nV=0;int nB=0;
 		for(int i=0;i<w;i++){
 			for(int j=0;j<h;j++){
-				//on recupere la couleur sous une forme chelou
-				R=(im.getRGB(i,j) & 0xFF0000)>>16;
-				V=(im.getRGB(i,j) & 0x00FF00)>>8;
-				B=(im.getRGB(i,j) & 0x0000FF);
+				
+			    Color pixelcolor= new Color(im.getRGB(i, j));
+			      
+			    R=pixelcolor.getRed();
+			    V=pixelcolor.getGreen();
+			    B=pixelcolor.getBlue();
 				
 				if(max(R,V,B)==R){
 					nR++;
