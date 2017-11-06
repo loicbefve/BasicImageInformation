@@ -112,7 +112,7 @@ public class CustomImage {
 	 * @throws FileNotFoundException,IOException, ImageFormatException
 	 */
 	public static BufferedImage read(File filename)throws FileNotFoundException,IOException, ImageFormatException{
-		System.out.println("ici");
+		
 		String nm="",pal="",dims="",pixel_size="";
 		InputStream flux;
 		

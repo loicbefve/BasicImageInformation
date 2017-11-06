@@ -39,9 +39,9 @@ public class Quantification {
 		List<Point> listePoints =new ArrayList<Point>();//liste des pixels de l'image
 		int R=0;int V=0;int B=0;
 		
-		for(int i=0;i<image.getWidth();i=i+10){
+		for(int i=0;i<image.getWidth();i++){
 			//TODO refaire le tri, le +10 sert à éviter les problèmes de récursion dans le tri
-			for(int j=0;j<image.getHeight();j=j+10){
+			for(int j=0;j<image.getHeight();j++){
 				//on recupere la couleur
 				R=(image.getRGB(i,j) & 0xFF0000)>>16;
 				V=(image.getRGB(i,j) & 0x00FF00)>>8;
