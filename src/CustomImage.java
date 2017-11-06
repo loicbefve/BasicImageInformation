@@ -6,6 +6,7 @@ import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +24,7 @@ import sun.awt.image.ImageFormatException;
  * <li>The fourth line contains the color list formated as : "0xRRGGBB 0xRRGGBB ..."</li>
  * </ul>
  * 
- *	Each pixel is an index to a given color in the color list.
+ *	Each pixel is a byte that represents an index to a given color in the color list.
  *</p>
  *	
  */
@@ -31,19 +32,45 @@ import sun.awt.image.ImageFormatException;
 public class CustomImage {
 	/**
 	 * 
+	 * @param message 
+	 * @param classe 
+	 * @param fonction 
+	 * @param ligne 
+	 * @return ImageFormatExpression with a StackTrace and a message
+	 */
+	private static ImageFormatException makeException(String message,String classe,String fonction,int ligne){
+		
+		ImageFormatException e=new ImageFormatException(message);
+		StackTraceElement[] s= {new StackTraceElement(classe,fonction,null,ligne)};
+		e.setStackTrace(s);
+		
+		return e;
+	}
+	/**
+	 * 
 	 * Public function which writes the data of a BufferedImage following the cst protocole
 	 * 
 	 * @param image : BufferedImage that contains the cst image to write in filename
 	 * @param filename 
+	 * @throws ImageFormatException,IOException 
 	 */
-	public static void write(BufferedImage image,String filename){
+	public static void write(BufferedImage image,String filename) throws ImageFormatException, IOException{
 		
-		File fichier=new File(filename);
 		
-		try(FileWriter fw = new FileWriter(fichier)){
-			
+		
+		try{
+			File fichier=new File(filename);
+			FileWriter fw = new FileWriter(fichier);
 			//on reccupere les donnees necessaires
-			IndexColorModel cm=(IndexColorModel)image.getColorModel();
+			IndexColorModel cm;
+			try{
+				cm=(IndexColorModel)image.getColorModel();
+			}
+			catch(Exception f){
+				fw.close();
+				String message="Mauvais format de color model";
+				throw makeException(message,"CustomImage","write",62);
+			}
 			int msize=cm.getMapSize();
 			int psize=cm.getPixelSize();
 			int[] palette=new int[msize];
@@ -64,7 +91,7 @@ public class CustomImage {
 			for(int i=0;i<image.getHeight();i++){
 				for(int j=0;j<image.getWidth();j++){
 					
-					fw.write(Integer.toHexString(Quantification.getIndex(palette, image.getRGB(j,i))));
+					fw.write((byte)Quantification.getIndex(palette, image.getRGB(j,i)));
 				}
 				
 			}
@@ -74,68 +101,105 @@ public class CustomImage {
 		
 		}
 		catch (IOException e) {
-    		e.printStackTrace();
+    		throw e;
     	}
 	}
-	
+
 	/**
-	 * Public function that read a file with a given name filename and return a compatible BufferedImage
+	 * Public function that read a cst file with a given name filename and return a compatible BufferedImage
 	 * @param filename
 	 * @return a BufferedImage that represent the image stored in the file named filename
+	 * @throws FileNotFoundException,IOException, ImageFormatException
 	 */
-	public static BufferedImage read(File filename){
-		
+	public static BufferedImage read(File filename)throws FileNotFoundException,IOException, ImageFormatException{
+		System.out.println("ici");
 		String nm="",pal="",dims="",pixel_size="";
+		InputStream flux;
 		
-		try{
-			
-			InputStream flux=new FileInputStream(filename); 
-			InputStreamReader lecture=new InputStreamReader(flux);
-			BufferedReader buff=new BufferedReader(lecture);
-			
-			nm=buff.readLine();
-			ImageFormatException e=new ImageFormatException("Mauvais format d'image! Id="+nm+", Expected Id= P10" );
-			if(!nm.equals("P10")){
-				buff.close(); 
-				lecture.close();
-				flux.close();
-				throw e;
-			}
+		//peut renvoyer une FileNotFoundException
+		flux=new FileInputStream(filename); 
+		
+		InputStreamReader lecture=new InputStreamReader(flux);
+		BufferedReader buff=new BufferedReader(lecture);
+		
+		//peut renvoyer une IOException
+		nm=buff.readLine();
+		
+		if(nm==null || !nm.equals("P10")){
+			//peut renvoyer une IOException
+			buff.close();lecture.close();flux.close();
+			String message="Mauvais format d'image! type="+nm+", type attendu= P10";
+			throw makeException(message,"CustomImage","read",122);
+		}
 
-			dims=buff.readLine();
-			String[] wh=dims.split(" ");
-			int w=Integer.parseInt(wh[0]);
-			int h=Integer.parseInt(wh[1]);
-			
-			pixel_size=buff.readLine();
-			int ps=Integer.parseInt(pixel_size);
-			
-			pal=buff.readLine();
-			String[] palette=pal.split(" ");
+		dims=buff.readLine();
+		String[] wh=dims.split(" ");
+		int w,h;
+		try{
+			assert wh.length==2 ;
+			w=Integer.parseInt(wh[0]);
+			h=Integer.parseInt(wh[1]);
+		}
+		catch(Exception e){
+			buff.close();lecture.close();flux.close();
+			String message="Mauvais format longueur/hauteur, type="+dims+", type attendu= int int";
+			throw makeException(message,"CustomImage","read",134);
+		}
 		
-			byte[] pixels = new byte[w*h];
-			int a=' ',z=0;
-			while((a=buff.read())!=-1){//si a=-1 on arrive a la fin du fichier
-				
-				pixels[z++]=chartoByte((char)a);
-			}
+		pixel_size=buff.readLine();
+		
+		int ps;
+		try{
+		ps=Integer.parseInt(pixel_size);
+		}
+		catch(NumberFormatException f){
+			buff.close();lecture.close();flux.close();
+			String message="Mauvais format pixel size, type="+pixel_size+", type attendu= int";
+			throw makeException(message,"CustomImage","read",149);
+		}
+		if(ps>8){
+			buff.close(); lecture.close();flux.close();
+			String message="Pixel size trop grande! "+ps+">8bits, lecture impossible";
+			throw makeException(message,"CustomImage","read",149);
+		}
+		
+		pal=buff.readLine();
+		String[] palette=pal.split(" ");
+		
+		byte[] pixels = new byte[w*h];
+		int a=0,z=0;
+		while((a=buff.read())!=-1){//si a=-1 on arrive a la fin du fichier
+			
+			try{pixels[z++]=(byte)a;}
+			catch(ArrayIndexOutOfBoundsException f){
+				buff.close(); lecture.close();flux.close();
+				String message="Trop de pixels,longueur*hauteur";
+				throw  makeException(message,"CustomImage","read",169);
+			}	
+		}
 	
-			buff.close(); 
-			lecture.close();
-			flux.close();
+		buff.close(); lecture.close();flux.close();
 			
 		byte r[]=new byte[palette.length];
 		byte v[]=new byte[palette.length];
 		byte b[]=new byte[palette.length];
 		
-		int c;
+		int c=0;
 		for(int i=0;i<palette.length;i++){
 		//on prepare les donnees du color model
+			//peut renvoyer NumberFormatException
+			try{
 			c=Integer.parseInt(palette[i],16);
+			}
+			catch(NumberFormatException f){
+				String message="mauvais format pour une couleur de la palette attendu=0xRRGGBB, obtenu="+palette[i];
+				throw  makeException(message,"CustomImage","read",187);
+			}
 			r[i]=(byte) ((c& 0xFF0000)>>16);
 			v[i]=(byte) ((c& 0x00FF00)>>8);
 			b[i]=(byte) (c& 0x0000FF);
 		}
+		
 		
 		DataBufferByte dataBuffer = new DataBufferByte(pixels, w*h);
 		WritableRaster raster=Raster.createPackedRaster(dataBuffer,w,h,ps,null);
@@ -146,39 +210,7 @@ public class CustomImage {
 		
 		return image2;
 		
-		}		
-		catch (Exception e){
-			System.out.println(e);
-			return null;	
-		}
-	}
-	/**
-	 *  Private fontion that transforms a char into an hexadecimal value, poorly writed 
-	 * @param c
-	 * @return the associated byte
-	 */
-	private static byte chartoByte(char c) {
-	//TODO si quelqu'un trouve une meilleure solution je suis preneur 
-		switch(c){
-		case 'f':
-			return 15;
-		case 'e':
-			return 14;
-		case 'd':
-			return 13;
-		case 'c':
-			return 12;
-		case 'b':
-			return 11;
-		case 'a':
-			return 10;
-		default:
-				
-			return (byte)(c-'0');
-		}
-		
-		
-	}
+	}		
 		
 	
 }
