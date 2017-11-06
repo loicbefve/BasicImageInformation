@@ -260,16 +260,16 @@ public class KdTree {
 	// TODO : Plus tard
 //	public void removeNode ( Point point ) {
 //		
+////	}
+//	public int distsq(KdNode n1,KdNode n2){
+//		
+//		int res=0;
+//		for(int i=0;i<n1.point.dim;i++){
+//			
+//			res+=(n1.point.coord[i]-n2.point.coord[i])*(n1.point.coord[i]-n2.point.coord[i]);
+//		}
+//		return res;
 //	}
-	public int distsq(KdNode n1,KdNode n2){
-		
-		int res=0;
-		for(int i=0;i<n1.point.dim;i++){
-			
-			res+=(n1.point.coord[i]-n2.point.coord[i])*(n1.point.coord[i]-n2.point.coord[i]);
-		}
-		return res;
-	}
 	/**
 	 * public function which find the nearest neighbor of the given point in the tree
 	 *
@@ -298,7 +298,7 @@ public class KdTree {
 
 		if(d>0){//si la distance est positive on part a droite le plus souvent
 			
-			if(pere.filsDroit!=null && distsq(node,pere.filsDroit)<=d*d){
+			if(pere.filsDroit!=null && node.point.distsq(pere.filsDroit.point)<=d*d){
 			//si le fils est plus proche du point que la limite de l'hyperplan
 				
 				return getNearestNeighbor(pere.filsDroit,node);
@@ -317,14 +317,14 @@ public class KdTree {
 				KdNode a=getNearestNeighbor(pere.filsDroit,node);
 				KdNode b=getNearestNeighbor(pere.filsGauche,node);
 				
-				if(distsq(a,node)<distsq(b,node)){
+				if(a.point.distsq(node.point)<b.point.distsq(node.point)){
 					return a;
 				}
 				else return b;
 			}
 		}
 		else{//meme chose a gauche
-			if(pere.filsGauche!=null && distsq(node,pere.filsGauche)<=d*d){
+			if(pere.filsGauche!=null && node.point.distsq(pere.filsGauche.point)<=d*d){
 				
 				return getNearestNeighbor(pere.filsGauche,node);
 			}
@@ -341,7 +341,7 @@ public class KdTree {
 				KdNode a=getNearestNeighbor(pere.filsDroit,node);
 				KdNode b=getNearestNeighbor(pere.filsGauche,node);
 				
-				if(distsq(a,node)<distsq(b,node)){
+				if(a.point.distsq(node.point)< b.point.distsq(node.point)){
 					return a;
 				}
 				else return b;
