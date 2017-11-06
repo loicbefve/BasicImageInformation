@@ -1,5 +1,6 @@
 package kdtree;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class KdTree {
@@ -158,16 +159,30 @@ public class KdTree {
 	 * @param int direction: an integer representing the coordinate of the point that we have interest for
 	 * @return Point: the median point of the sorted list
 	 */
-	private Point mediane( List<Point> listePointsTriee , int direction) {
+	private Point mediane( List<Point> listePoints , int direction) {
+		//TODO: Refaire la doc
+		final int dir = direction;
+		listePoints.sort(new Comparator<Point>() {
+		    @Override
+		    public int compare(Point p1, Point p2) {
+		        if(p1.getCoord(dir) > p2.getCoord(dir)){
+		            return 1;
+		        }
+		        else if(p1.getCoord(dir) < p2.getCoord(dir)) {
+		        	return -1;
+		        }
+		        return 0;
+		     }
+		});
 		
-		if(listePointsTriee.size() > 0) {
-			if(listePointsTriee.size()%2 != 0) {
-				return listePointsTriee.get(listePointsTriee.size()/2);
+		if(listePoints.size() > 0) {
+			if(listePoints.size()%2 != 0) {
+				return listePoints.get(listePoints.size()/2);
 			}
-			return listePointsTriee.get(listePointsTriee.size()/2-1);
+			return listePoints.get(listePoints.size()/2-1);
 		}
 		else {
-			return listePointsTriee.get(0);
+			return listePoints.get(0);
 		}
 	}
 	/**
@@ -180,27 +195,26 @@ public class KdTree {
 	 */
 	private KdNode createKdTree (List<Point> listePoints , int k , int profondeur) {
 		
+		int size = listePoints.size();
+		final int direction = profondeur%k;
+		
 		if( listePoints.isEmpty() ) {
 			return null;
 		}
 		
-		int direction = profondeur%k;
-		List<Point> listePointsTriee = tri(listePoints , direction);
-		int size = listePointsTriee.size();
-		
-		Point point = mediane(listePointsTriee , direction);
+		Point point = mediane(listePoints , direction);
 		KdNode res = new KdNode(point);
 		res.direction = direction;
-		if(listePointsTriee.size() > 2) {
+		
+		if(size > 2) {
 			//les listes étant triees on sait qu'elles sont du bon cote
-			res.filsGauche = createKdTree(listePointsTriee.subList(0, listePointsTriee.indexOf(point)) , k , profondeur+1);
-			res.filsDroit = createKdTree(listePointsTriee.subList(listePointsTriee.indexOf(point)+1 , size) , k , profondeur+1);
-			
+			res.filsGauche = createKdTree(listePoints.subList(0, listePoints.indexOf(point)) , k , profondeur+1);
+			res.filsDroit = createKdTree(listePoints.subList(listePoints.indexOf(point)+1 , size) , k , profondeur+1);
 			return res;
 		}
-		else if (listePointsTriee.size() == 2){
+		else if (size == 2){
 			res.filsGauche = null;
-			res.filsDroit = createKdTree(listePointsTriee.subList(listePointsTriee.indexOf(point)+1 , size) , k , profondeur+1);
+			res.filsDroit = createKdTree(listePoints.subList(listePoints.indexOf(point)+1 , size) , k , profondeur+1);
 			return res;
 		}
 		else {
@@ -259,17 +273,6 @@ public class KdTree {
 	
 	// TODO : Plus tard
 //	public void removeNode ( Point point ) {
-//		
-////	}
-//	public int distsq(KdNode n1,KdNode n2){
-//		
-//		int res=0;
-//		for(int i=0;i<n1.point.dim;i++){
-//			
-//			res+=(n1.point.coord[i]-n2.point.coord[i])*(n1.point.coord[i]-n2.point.coord[i]);
-//		}
-//		return res;
-//	}
 	/**
 	 * public function which find the nearest neighbor of the given point in the tree
 	 *
