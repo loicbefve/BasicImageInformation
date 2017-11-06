@@ -64,7 +64,7 @@ public class Quantification {
 		for(int i=0;i<image.getHeight();i++){
 			for(int j=0;j<image.getWidth();j++){
 				
-				pixelcolor=new Color(image.getRGB(i, j));
+				pixelcolor=new Color(image.getRGB(j, i));
 				
 				R=pixelcolor.getRed();
 				V=pixelcolor.getGreen();

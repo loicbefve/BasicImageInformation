@@ -304,6 +304,7 @@ public class KdTree {
 	 * @param KdNode pere: a node of the tree
 	 * @param KdNode node: the node that needs to find its nearest neighbor
 	 */	
+	
 	private KdNode getNearestNeighbor(KdNode pere,KdNode node){
 		
 		if(pere.isTerminal()){
@@ -316,7 +317,7 @@ public class KdTree {
 			
 			if(pere.filsDroit!=null && node.point.distsq(pere.filsDroit.point)<=d*d){
 			//si le fils est plus proche du point que la limite de l'hyperplan
-			
+				
 				return getNearestNeighbor(pere.filsDroit,node);
 			}
 			else if(pere.filsDroit==null){
@@ -329,7 +330,7 @@ public class KdTree {
 			}
 			else{
 			//sinon on doit regarder des deux cotes et on retourne le plus proche
-			
+				
 				KdNode a=getNearestNeighbor(pere.filsDroit,node);
 				KdNode b=getNearestNeighbor(pere.filsGauche,node);
 				
