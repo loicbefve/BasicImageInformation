@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.IndexColorModel;
@@ -8,8 +9,8 @@ import java.awt.image.WritableRaster;
 import kdtree.*;
 
 /**
- * <p> Class used to compress a given image 
- * the static value L2N_COLORS is the log2 of the actual number of colors we want in the color list </p>
+ * <p> Class used to compress a given image.</p> 
+ * <p>the static value L2N_COLORS is the log2 of the actual number of colors we want in the color list </p>
  */
 public class Quantification {
 	
@@ -38,14 +39,15 @@ public class Quantification {
 		
 		List<Point> listePoints =new ArrayList<Point>();//liste des pixels de l'image
 		int R=0;int V=0;int B=0;
-		
+		Color pixelcolor; 
 		for(int i=0;i<image.getWidth();i++){
-			//TODO refaire le tri, le +10 sert à éviter les problèmes de récursion dans le tri
+			
 			for(int j=0;j<image.getHeight();j++){
 				//on recupere la couleur
-				R=(image.getRGB(i,j) & 0xFF0000)>>16;
-				V=(image.getRGB(i,j) & 0x00FF00)>>8;
-				B=(image.getRGB(i,j) & 0x0000FF);
+				pixelcolor=new Color(image.getRGB(i, j));
+				R=pixelcolor.getRed();
+				V=pixelcolor.getGreen();
+				B=pixelcolor.getBlue();
 				listePoints.add(new Point(R,V,B));
 			}
 		}
@@ -62,9 +64,12 @@ public class Quantification {
 		for(int i=0;i<image.getHeight();i++){
 			for(int j=0;j<image.getWidth();j++){
 				
-				R=(image.getRGB(j,i) & 0xFF0000)>>16;
-				V=(image.getRGB(j,i) & 0x00FF00)>>8;
-				B=(image.getRGB(j,i) & 0x0000FF);
+				pixelcolor=new Color(image.getRGB(i, j));
+				
+				R=pixelcolor.getRed();
+				V=pixelcolor.getGreen();
+				B=pixelcolor.getBlue();
+				
 				p.setCoord(R,V,B);
 				g=tree_palette.getNearestNeighbor(p);//g est le point de la palette correspondant à p
 				ig=(g.getCoord(0)<<16 | g.getCoord(1)<<8 | g.getCoord(2));//on transforme g en une couleur 0xRRVVBB

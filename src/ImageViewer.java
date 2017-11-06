@@ -3,14 +3,15 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 
@@ -73,8 +74,6 @@ public class ImageViewer extends JFrame
 		buttonInversion.addActionListener(new InversionListener());
 		buttonQuant.addActionListener(new Quantilistener());
 		
-		
-		
 		//Fenêtre globale
 		JPanel global = new JPanel();
 		global.setLayout(new BoxLayout(global, BoxLayout.LINE_AXIS));
@@ -94,7 +93,7 @@ public class ImageViewer extends JFrame
 		//Menu -> Save
 		itemSave.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				saveImage("save.png");
+				MenuActions.saveImage(outputImage.getImage(),"save.png");
 			}
 		});
 		this.fileMenu.add(itemSave);
@@ -105,21 +104,18 @@ public class ImageViewer extends JFrame
 				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.setDialogTitle("Specify a file to save");   
 				int userSelection = fileChooser.showSaveDialog(ImageViewer.this);
-				 
+				
 				if (userSelection == JFileChooser.APPROVE_OPTION) {
 				    File fileToSave = fileChooser.getSelectedFile();
 				    try{
 				    	fileToSave.createNewFile();
-					    saveImage(fileToSave.getAbsolutePath());
+					    MenuActions.saveImage(outputImage.getImage(),fileToSave.getAbsolutePath());
 					    System.out.println("Save as file: " + fileToSave.getAbsolutePath());
 				    }
 				    catch(Exception e){
 				    	e.printStackTrace();
-				    }
-				    
-				}
-				
-				
+				    }   
+				}		
 			}
 		});
 		this.fileMenu.add(itemSaveAs);
@@ -127,7 +123,26 @@ public class ImageViewer extends JFrame
 		//Menu -> Load
 		itemLoad.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				loadImage();
+				
+				JFileChooser chooser = new JFileChooser();
+			    FileNameExtensionFilter filter =
+			    new FileNameExtensionFilter("JPG, PNG & GIF Images", "jpg", "gif", "png","cst");//cst pour custom
+			    chooser.setFileFilter(filter);
+			    try{
+			    	int returnVal = chooser.showOpenDialog(ImageViewer.this);
+			    	File fichier;
+			    	if(returnVal == JFileChooser.APPROVE_OPTION) {
+			    		fichier=chooser.getSelectedFile();
+			    		BufferedImage image=MenuActions.loadImage(fichier);
+			    		outputImage.setImage(image);
+						inputImage.setImage(image);
+						output.repaint();
+						input.repaint();
+			    	}
+			    }
+			    catch(Exception e){
+			    	e.printStackTrace();
+			    }
 			}
 		});
 		this.fileMenu.add(itemLoad);
@@ -136,80 +151,8 @@ public class ImageViewer extends JFrame
 		this.menuBar.add(fileMenu);
 		this.setJMenuBar(menuBar);
 		this.setVisible(true);	
-	}		
-	
-	public Boolean saveImage(String name)
-	/**
-	 * Public function that save an Image in the given file,
-	 * @param name
-	 * @return a boolean : true is the image has been saved, false otherwise
-	 */
-	{
-		Boolean b = false;
 		
-		try
-		{
-			
-			String[] n=name.split("\\.");
-			
-			if(n.length==2 && n[1].equals("cst")){//si c'est une image custom avec un nom propre
-				CustomImage.write(outputImage.getImage(),name);
-				System.out.println("Format cst");
-				b=true;
-			}
-			else{
-				b = ImageIO.write(outputImage.getImage(), "png", new File(name));
-			}
-		}
-    	catch (Exception e) {
-    		e.printStackTrace();
-    	}
-		
-		return b;
-	}
-	
-	public void loadImage() {
-		/**
-		 * Public function that load an image from a chosen file
-		 */
-		JFileChooser chooser = new JFileChooser();
-	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
-	        "JPG, PNG & GIF Images", "jpg", "gif", "png","cst");//cst pour custom
-	    chooser.setFileFilter(filter);
-	    
-	    try
-	    {
-	    	int returnVal = chooser.showOpenDialog(ImageViewer.this);
-	    	if(returnVal == JFileChooser.APPROVE_OPTION) {
-	    			
-	    		
-	    		File fichier=chooser.getSelectedFile();
-	    		String name=fichier.getName();
-	    		String[] n=name.split("\\.");
-	    		if(n.length==2 && n[1].equals("cst")){
-	    				
-	    			inputImage.setImage(CustomImage.read(fichier));
-	    			outputImage.setImage(CustomImage.read(fichier));
-	    		}
-	    		else{
-	    				
-	    			inputImage.setImage(ImageIO.read(fichier));
-	    			outputImage.setImage(ImageIO.read(fichier));
-	    		}
-	    			
-	    		input.repaint();
-	    		output.repaint();
-	    	}
-	    }
-	    catch (Exception e) {
-	    			
-	        e.printStackTrace();
-	    }    
-	    	
-	    
-	}
-	
-	
+	}	
 	
 	class InversionListener implements ActionListener{
 		/**Listener of the "inversion" button*/

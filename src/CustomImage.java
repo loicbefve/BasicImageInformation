@@ -22,9 +22,9 @@ import sun.awt.image.ImageFormatException;
  * <li>The second line contains the dimensions : "WIDTH HEIGHT" </li>
  * <li>The third line contains the number of bits for each pixels</li>
  * <li>The fourth line contains the color list formated as : "0xRRGGBB 0xRRGGBB ..."</li>
+ * <li>Each pixel is a byte that represents an index to a given color in the color list.</li>
+ * <li>Note : A quantified image stored as a png is lighter than a quantified image stored as a cst</li>
  * </ul>
- * 
- *	Each pixel is a byte that represents an index to a given color in the color list.
  *</p>
  *	
  */

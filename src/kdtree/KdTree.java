@@ -2,9 +2,23 @@ package kdtree;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
+/**
+ * 
+ * <p>KdTree is a binary search tree of n dimensions
+ * <ul>*
+ * <li>A KdTree only contains a KdNode, it is the root of the tree</li>
+ * <li>KdNode is a private class, each vector is stored in a KdNode</li>
+ * </ul>
+ * </p>
+ *
+ */
 public class KdTree {
-	
+	/**
+	 * 
+	 * <p>Each vector is stored in a Kdnode, a Kdnode is linked to at most 2 others Kdnodes, 
+	 * they are used to order the vector along one dimension.
+	 *</p>
+	 */
 	private class KdNode {
 			
 			private KdNode filsDroit;
@@ -29,13 +43,13 @@ public class KdTree {
   
 			}
 			
-			
+			/**
+			 * This public method returns if the node is terminal or not
+			 *
+			 * @return      a boolean true:terminal , false:not terminal
+			 */
 			public boolean isTerminal(){
-				/**
-				 * This public method returns if the node is terminal or not
-				 *
-				 * @return      a boolean true:terminal , false:not terminal
-				 */
+				
 				return (filsDroit==null && filsGauche==null);
 			}
 			
@@ -96,7 +110,6 @@ public class KdTree {
 		String res="";
 		return res;
 	}
-	
 	
 	/**
 	 * Private function which returns the list of points given but 
@@ -303,7 +316,7 @@ public class KdTree {
 			
 			if(pere.filsDroit!=null && node.point.distsq(pere.filsDroit.point)<=d*d){
 			//si le fils est plus proche du point que la limite de l'hyperplan
-				
+			
 				return getNearestNeighbor(pere.filsDroit,node);
 			}
 			else if(pere.filsDroit==null){
@@ -316,7 +329,7 @@ public class KdTree {
 			}
 			else{
 			//sinon on doit regarder des deux cotes et on retourne le plus proche
-				
+			
 				KdNode a=getNearestNeighbor(pere.filsDroit,node);
 				KdNode b=getNearestNeighbor(pere.filsGauche,node);
 				
