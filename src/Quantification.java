@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.IndexColorModel;
@@ -8,12 +9,12 @@ import java.awt.image.WritableRaster;
 import kdtree.*;
 
 /**
- * <p> Class used to compress a given image 
- * the static value L2N_COLORS is the log2 of the actual number of colors we want in the color list </p>
+ * <p> Class used to compress a given image.</p> 
+ * <p>the static value L2N_COLORS is log2 of the maximum number of colors we want in the color list, it should not be greater than 8 </p>
  */
 public class Quantification {
 	
-	public static final int L2N_COLORS=4;
+	public static final int L2N_COLORS=8;
 	/**
 	 * Public static function that returns the index of a given value in an array
 	 * @param int[] palette : array of integer
@@ -38,22 +39,27 @@ public class Quantification {
 		
 		List<Point> listePoints =new ArrayList<Point>();//liste des pixels de l'image
 		int R=0;int V=0;int B=0;
-		
-		for(int i=0;i<image.getWidth();i=i+10){
-			//TODO refaire le tri, le +10 sert à éviter les problèmes de récursion dans le tri
-			for(int j=0;j<image.getHeight();j=j+10){
+		Color pixelcolor; 
+		for(int i=0;i<image.getWidth();i++){
+			
+			for(int j=0;j<image.getHeight();j++){
 				//on recupere la couleur
-				R=(image.getRGB(i,j) & 0xFF0000)>>16;
-				V=(image.getRGB(i,j) & 0x00FF00)>>8;
-				B=(image.getRGB(i,j) & 0x0000FF);
-				listePoints.add(new Point(R,V,B));
+				pixelcolor=new Color(image.getRGB(i, j));
+				R=pixelcolor.getRed();
+				V=pixelcolor.getGreen();
+				B=pixelcolor.getBlue();
+				listePoints.add(new Point(R,V,B,0));
 			}
 		}
 		
-		KdTree tree_palette=new KdTree(listePoints,3);
-		tree_palette.troncature(tree_palette.racine,L2N_COLORS);
-		int palette[]=tree_palette.remplissage(L2N_COLORS);//on recupere les couleurs sous forme 0xRRVVBB
-		
+		KdTree tree=new KdTree(listePoints,3,L2N_COLORS+1);
+		List<Point> palette=tree.getColors(L2N_COLORS);
+		int nb_couleurs=palette.size();
+		for(int i=0;i<nb_couleurs;i++){
+			palette.get(i).setOneCoord(3,i);
+		}
+		KdTree tree_palette=new KdTree(palette,3,L2N_COLORS+1);
+		System.out.println(palette.size());
 		Point p=new Point(0,0,0);
 		Point g;
 		
@@ -62,29 +68,38 @@ public class Quantification {
 		for(int i=0;i<image.getHeight();i++){
 			for(int j=0;j<image.getWidth();j++){
 				
-				R=(image.getRGB(j,i) & 0xFF0000)>>16;
-				V=(image.getRGB(j,i) & 0x00FF00)>>8;
-				B=(image.getRGB(j,i) & 0x0000FF);
+				pixelcolor=new Color(image.getRGB(j, i));
+				
+				R=pixelcolor.getRed();
+				V=pixelcolor.getGreen();
+				B=pixelcolor.getBlue();
+				
 				p.setCoord(R,V,B);
 				g=tree_palette.getNearestNeighbor(p);//g est le point de la palette correspondant à p
-				ig=(g.getCoord(0)<<16 | g.getCoord(1)<<8 | g.getCoord(2));//on transforme g en une couleur 0xRRVVBB
-				index[i*image.getWidth()+j]=(byte)Quantification.getIndex(palette,ig);//on met l'indice de g dans la palette
+				ig=g.getCoord(3);//on transforme g en une couleur 0xRRVVBB
+				index[i*image.getWidth()+j]=(byte)ig;//on met l'indice de g dans la palette
 			}
 		}
 		//Creation de la nouvelle BufferedImage compressee
-		byte r[]=new byte[palette.length];
-		byte v[]=new byte[palette.length];
-		byte b[]=new byte[palette.length];
+		byte r[]=new byte[nb_couleurs];
+		byte v[]=new byte[nb_couleurs];
+		byte b[]=new byte[nb_couleurs];
 		
-		for(int i=0;i<palette.length;i++){
-			
-			r[i]=(byte) ((palette[i]& 0xFF0000)>>16);
-			v[i]=(byte) ((palette[i]& 0x00FF00)>>8);
-			b[i]=(byte) (palette[i]& 0x0000FF);
+		for(int ind=0;ind<nb_couleurs;ind++){
+			for(int j=0;j<nb_couleurs;j++){				
+				if(palette.get(j).getCoord(3)==ind){
+					
+					r[ind]=(byte) palette.get(j).getCoord(0);
+					v[ind]=(byte) palette.get(j).getCoord(1);
+					b[ind]=(byte) palette.get(j).getCoord(2);
+					break;
+				}
+				
+			}
 		}
 		DataBufferByte dataBuffer = new DataBufferByte(index, image.getWidth()*image.getHeight());
 		WritableRaster raster=Raster.createPackedRaster(dataBuffer,image.getWidth(),image.getHeight(),8,null);
-		IndexColorModel cm=new IndexColorModel(8,palette.length,r,v,b);
+		IndexColorModel cm=new IndexColorModel(8,nb_couleurs,r,v,b);
 		BufferedImage image_compressee=new BufferedImage(cm,raster,true,null);
 		
 		System.out.println("Compression reussie");

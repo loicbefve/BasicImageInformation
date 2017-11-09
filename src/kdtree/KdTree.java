@@ -1,10 +1,27 @@
 package kdtree;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
+/**
+ * 
+ * <p>KdTree is a binary search tree of n dimensions
+ * <ul>*
+ * <li>A KdTree only contains a KdNode, it is the root of the tree</li>
+ * <li>KdNode is a private class, each vector is stored in a KdNode</li>
+ * </ul>
+ * </p>
+ *
+ */
 public class KdTree {
 	
+	/**
+	 * 
+	 * <p>Each vector is stored in a Kdnode, a Kdnode is linked to at most 2 others Kdnodes, 
+	 * they are used to order the vector along one dimension.
+	 *</p>
+	 */
 	private class KdNode {
 			
 			private KdNode filsDroit;
@@ -29,14 +46,18 @@ public class KdTree {
   
 			}
 			
-			
+			/**
+			 * This public method returns if the node is terminal or not
+			 *
+			 * @return      a boolean true:terminal , false:not terminal
+			 */
 			public boolean isTerminal(){
-				/**
-				 * This public method returns if the node is terminal or not
-				 *
-				 * @return      a boolean true:terminal , false:not terminal
-				 */
+				
 				return (filsDroit==null && filsGauche==null);
+			}
+			
+			private int distsq(Point point){
+				return this.point.distsq(point);
 			}
 			
 		}
@@ -45,7 +66,7 @@ public class KdTree {
 
 	public String toString(){
 		
-		int profondeur=4;
+		int profondeur=6;
 		int parcours=0;
 		String chemin="";
 		boolean n=false;
@@ -96,7 +117,6 @@ public class KdTree {
 		String res="";
 		return res;
 	}
-	
 	
 	/**
 	 * Private function which returns the list of points given but 
@@ -193,12 +213,12 @@ public class KdTree {
 	 * @param int profondeur: the stage that we are creating
 	 * @return KdNode: the root of the created k-d tree 
 	 */
-	private KdNode createKdTree (List<Point> listePoints , int k , int profondeur) {
-		
+	private KdNode createKdTree (List<Point> listePoints , int k , int profondeur,int pmax) {
+		//TODO probleme de cas d'egalite a corriger, si on a plus des points egaux au niveau d'une mediane ca pose probleme
 		int size = listePoints.size();
 		final int direction = profondeur%k;
 		
-		if( listePoints.isEmpty() ) {
+		if( listePoints.isEmpty() || profondeur==pmax) {
 			return null;
 		}
 		
@@ -208,13 +228,15 @@ public class KdTree {
 		
 		if(size > 2) {
 			//les listes étant triees on sait qu'elles sont du bon cote
-			res.filsGauche = createKdTree(listePoints.subList(0, listePoints.indexOf(point)) , k , profondeur+1);
-			res.filsDroit = createKdTree(listePoints.subList(listePoints.indexOf(point)+1 , size) , k , profondeur+1);
+			
+			res.filsGauche = createKdTree(listePoints.subList(0, listePoints.indexOf(point)) , k , profondeur+1,pmax);
+			res.filsDroit = createKdTree(listePoints.subList(listePoints.indexOf(point)+1 , size) , k , profondeur+1,pmax);
+			
 			return res;
 		}
 		else if (size == 2){
 			res.filsGauche = null;
-			res.filsDroit = createKdTree(listePoints.subList(listePoints.indexOf(point)+1 , size) , k , profondeur+1);
+			res.filsDroit = createKdTree(listePoints.subList(listePoints.indexOf(point)+1 , size) , k , profondeur+1,pmax);
 			return res;
 		}
 		else {
@@ -223,15 +245,20 @@ public class KdTree {
 			return res;
 		}
 	}
+	
+		
 	/**
 	 * Constructor of the class k-d tree
 	 *
 	 * @param List<Point> listePoints: the list of point of the k-d tree 
 	 * @param int k: the dimension k of the k-d tree
 	 */
-	public KdTree( List<Point> listePoints , int k ) {
-		
-		this.racine = createKdTree( listePoints , k , 0 );
+	public KdTree( List<Point> listePoints , int k,int pmax ) {
+		//petit ajout qui permet de supprimer les doublons en temps linéaire cependant ce n'est surement pas la bonne méthode
+		Set<Point> setPoints=new HashSet<Point>();
+		setPoints.addAll(listePoints);
+		listePoints=new ArrayList<Point>(setPoints);
+		this.racine = createKdTree( listePoints , k , 0,pmax );
 	}
 	
 	private KdNode algoRecherche( KdNode noeudDepart, KdNode noeudCherch ) {
@@ -259,16 +286,19 @@ public class KdTree {
 		return noeudParent.point == point;
 	}
 	
-	public void addNode( Point point ) {
+	public KdNode addNode( Point point,int k ) {
+		
 		KdNode noeudToAdd = new KdNode(point);
 		KdNode noeudParent = algoRecherche(this.racine , noeudToAdd);
 		int direction = noeudParent.direction;
+		noeudToAdd.direction=(noeudParent.direction+1)%k;
 		if(point.coord[direction] < noeudParent.point.coord[direction]) {
 			noeudParent.filsGauche = noeudToAdd;
 		}
 		else if(point.coord[direction] > noeudParent.point.coord[direction]) {
 			noeudParent.filsDroit = noeudToAdd;
 		}
+		return noeudParent;
 	}
 	
 	// TODO : Plus tard
@@ -281,8 +311,8 @@ public class KdTree {
 	 */
 	public Point getNearestNeighbor( Point point ) {
 		
-		KdNode startNode=new KdNode(point);
-		return getNearestNeighbor(racine,startNode).point;
+		Integer distance=Integer.MAX_VALUE;
+		return getNearestNeighbor(racine,point,distance);
 		
 	} 
 	/**
@@ -291,65 +321,48 @@ public class KdTree {
 	 * @param KdNode pere: a node of the tree
 	 * @param KdNode node: the node that needs to find its nearest neighbor
 	 */	
-	private KdNode getNearestNeighbor(KdNode pere,KdNode node){
+	
+	private Point getNearestNeighbor(KdNode pere,Point point_a_placer,Integer distance){
 		
 		if(pere.isTerminal()){
-			return pere;
+			return pere.point;
 		}
-
-		int d=pere.point.coord[pere.direction]-node.point.coord[pere.direction];//distance par rapport a l'hyperplan
-
-		if(d>0){//si la distance est positive on part a droite le plus souvent
-			
-			if(pere.filsDroit!=null && node.point.distsq(pere.filsDroit.point)<=d*d){
-			//si le fils est plus proche du point que la limite de l'hyperplan
-				
-				return getNearestNeighbor(pere.filsDroit,node);
-			}
-			else if(pere.filsDroit==null){
 		
-				return getNearestNeighbor(pere.filsGauche,node);
+		int dpere=pere.distsq(point_a_placer);
+		distance=Math.min(dpere,distance);
+		
+		Point estimation1=null,estimation2=null,nearest=null;
+		KdNode restant=null;
+		//distance par rapport a l'hyperplan
+		if(pere.filsGauche!=null && point_a_placer.getCoord(pere.direction)<pere.point.getCoord(pere.direction)){
+			estimation1=getNearestNeighbor(pere.filsGauche,point_a_placer,distance);
+			if(pere.filsDroit!=null){
+				restant=pere.filsDroit;
 			}
-			else if(pere.filsGauche==null){
+		}
+		else if(pere.filsDroit!=null){
+			estimation1=getNearestNeighbor(pere.filsDroit,point_a_placer,distance);
+			if(pere.filsGauche!=null){
+				restant=pere.filsGauche;
+			}
+		}
+		
+		if(restant!= null && Math.abs(pere.point.getCoord(pere.direction)-point_a_placer.getCoord(pere.direction))<distance){
+			estimation2=getNearestNeighbor(restant,point_a_placer,distance);
+		}
+		
+		if(estimation2!=null && estimation2.distsq(point_a_placer)<estimation1.distsq(point_a_placer)){
+			nearest=estimation2;
+		}
+		else nearest=estimation1;
+		
+		if(dpere<nearest.distsq(point_a_placer)){
+			nearest=pere.point;
+		}
+		
+		return nearest;
+		
 			
-				return getNearestNeighbor(pere.filsDroit,node);
-			}
-			else{
-			//sinon on doit regarder des deux cotes et on retourne le plus proche
-				
-				KdNode a=getNearestNeighbor(pere.filsDroit,node);
-				KdNode b=getNearestNeighbor(pere.filsGauche,node);
-				
-				if(a.point.distsq(node.point)<b.point.distsq(node.point)){
-					return a;
-				}
-				else return b;
-			}
-		}
-		else{//meme chose a gauche
-			if(pere.filsGauche!=null && node.point.distsq(pere.filsGauche.point)<=d*d){
-				
-				return getNearestNeighbor(pere.filsGauche,node);
-			}
-			else if(pere.filsGauche==null){
-				
-				return getNearestNeighbor(pere.filsDroit,node);
-			}
-			else if(pere.filsDroit==null){
-				
-				return getNearestNeighbor(pere.filsGauche,node);
-			}
-			else{
-				
-				KdNode a=getNearestNeighbor(pere.filsDroit,node);
-				KdNode b=getNearestNeighbor(pere.filsGauche,node);
-				
-				if(a.point.distsq(node.point)< b.point.distsq(node.point)){
-					return a;
-				}
-				else return b;
-			}
-		}
 		
 	}
 	/**
@@ -378,42 +391,47 @@ public class KdTree {
 			troncature(pere.filsDroit,prof-1);
 			troncature(pere.filsGauche,prof-1);
 			
-		}
-		
+		}		
 	}
 	/**
-	 * Public function which fill a given array with the values of the nodes.point
-	 * for example if node.point.dim==3, points are hashed like this : 0x112233
-	 * 
-	 * @param int prof: number of the layer that is explored to fill the array
-	 * @return an int[] filled with the values of the (prof)th layer of the tree
+	 * @brief try to fill a list with 2^maxLayer colors, it starts the harvesting of colors at the level maxLayer
+	 *  if it is not enough, the search remade at maxLayer-1 etc
+	 * @param maxLayer first search level
+	 * @return a List containing the colors
 	 */
-	public int[] remplissage(int prof){
+	public List<Point> getColors(int maxLayer) {
+		List<Point> result=new ArrayList<Point>();
+		int hl=0;
+		int nombreCouleursMax=1<<maxLayer;
 		
-		int palette[]=new int[1<<prof];
-		KdNode n=racine;
-		int parcours=0;int color=0;
-		for(int j=0;j<(1<<prof);j++){
-			for(int i=0;i<prof;i++){
-				if((parcours & (1<<i))==0){
-					n=n.filsDroit;
-				}
-				else{
-					n=n.filsGauche;
-				}
-			}
-			
-			for(int k=n.point.dim-1;k>=0;k--){
-				color|=(n.point.getCoord(n.point.dim-1-k)<<8*k);
-				//chaque dimension est encodée sur 8bits, l'octet de poids fort correspond a la derniere dimension
-			}
-			palette[parcours]=color;
-			parcours++;
-			color=0;
-			n=racine;
+		while(hl<=maxLayer && result.size()<nombreCouleursMax){
+			getColors(result,racine,maxLayer,hl);
+			hl++;
 		}
 		
-		return palette;
-	
+		return result;
 	}
+	
+	private List<Point> getColors(List<Point> result,KdNode pere,int maxLayer,int harvestLayer){
+		if(maxLayer==harvestLayer && pere!=null){
+			result.add(pere.point);
+		}
+		if(pere.filsDroit!=null){
+			getColors(result,pere.filsDroit,maxLayer-1,harvestLayer);
+			
+		}
+		if(pere.filsGauche!=null){
+			getColors(result,pere.filsGauche,maxLayer-1,harvestLayer);
+			
+		}
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 }

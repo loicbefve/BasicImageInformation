@@ -6,12 +6,13 @@ import javax.swing.JPanel;
 import org.jfree.chart.*; 
 import org.jfree.chart.plot.*; 
 import org.jfree.data.category.DefaultCategoryDataset;
-import java.awt.Color;
 
-
+/**
+ * <p> This class contains a static method required to create an histogram of R-G-B pixels within an image</p>
+ */
 public class Histogramme{
 	
-	public static int max(int a,int b, int c){
+	private static int max(int a,int b, int c){
 		if(a>=b && a>=c){
 			
 			return a;
@@ -23,7 +24,11 @@ public class Histogramme{
 		
 		return c;
 	}
-	
+	/**
+	 * method that create an histogram of im in a new Jframe
+	 * @param im is a BufferedImage 
+	 * 
+	 */
 	public static void createHisto(BufferedImage im){
 		
 		

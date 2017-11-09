@@ -22,9 +22,9 @@ import sun.awt.image.ImageFormatException;
  * <li>The second line contains the dimensions : "WIDTH HEIGHT" </li>
  * <li>The third line contains the number of bits for each pixels</li>
  * <li>The fourth line contains the color list formated as : "0xRRGGBB 0xRRGGBB ..."</li>
+ * <li>Each pixel is a byte that represents an index to a given color in the color list.</li>
+ * <li>Note : A quantified image stored as a png is lighter than a quantified image stored as a cst</li>
  * </ul>
- * 
- *	Each pixel is a byte that represents an index to a given color in the color list.
  *</p>
  *	
  */
@@ -112,7 +112,7 @@ public class CustomImage {
 	 * @throws FileNotFoundException,IOException, ImageFormatException
 	 */
 	public static BufferedImage read(File filename)throws FileNotFoundException,IOException, ImageFormatException{
-		System.out.println("ici");
+		
 		String nm="",pal="",dims="",pixel_size="";
 		InputStream flux;
 		
@@ -185,22 +185,23 @@ public class CustomImage {
 		byte b[]=new byte[palette.length];
 		
 		int c=0;
-		for(int i=0;i<palette.length;i++){
-		//on prepare les donnees du color model
-			//peut renvoyer NumberFormatException
-			try{
-			c=Integer.parseInt(palette[i],16);
+		try{
+			for(int i=0;i<palette.length;i++){
+				//on prepare les donnees du color model
+				//peut renvoyer NumberFormatException
+			
+				c=Integer.parseInt(palette[i],16);
+			
+			
+				r[i]=(byte) ((c& 0xFF0000)>>16);
+				v[i]=(byte) ((c& 0x00FF00)>>8);
+				b[i]=(byte) (c& 0x0000FF);
 			}
-			catch(NumberFormatException f){
-				String message="mauvais format pour une couleur de la palette attendu=0xRRGGBB, obtenu="+palette[i];
-				throw  makeException(message,"CustomImage","read",187);
-			}
-			r[i]=(byte) ((c& 0xFF0000)>>16);
-			v[i]=(byte) ((c& 0x00FF00)>>8);
-			b[i]=(byte) (c& 0x0000FF);
 		}
-		
-		
+		catch(NumberFormatException f){
+			String message="mauvais format pour une couleur de la palette attendu=0xRRGGBB";
+			throw  makeException(message,"CustomImage","read",187);
+		}
 		DataBufferByte dataBuffer = new DataBufferByte(pixels, w*h);
 		WritableRaster raster=Raster.createPackedRaster(dataBuffer,w,h,ps,null);
 		IndexColorModel cm=new IndexColorModel(ps,palette.length,r,v,b);
