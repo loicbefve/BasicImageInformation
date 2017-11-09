@@ -214,7 +214,7 @@ public class KdTree {
 	 * @return KdNode: the root of the created k-d tree 
 	 */
 	private KdNode createKdTree (List<Point> listePoints , int k , int profondeur,int pmax) {
-		
+		//TODO probleme de cas d'egalite a corriger, si on a plus des points egaux au niveau d'une mediane ca pose probleme
 		int size = listePoints.size();
 		final int direction = profondeur%k;
 		
