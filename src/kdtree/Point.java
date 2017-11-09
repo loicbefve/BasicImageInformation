@@ -22,6 +22,11 @@ public class Point {
 			coord[i]=c[i];
 		}
 	}
+	
+	public void setOneCoord(int dim,int val){
+		assert(dim< this.dim);
+		coord[dim]=val;
+	}
 	public String toString() {
 		String ret = "(";
 		for(int i : coord) {
@@ -33,7 +38,7 @@ public class Point {
 	public int distsq(Point p2){
 		
 		int res=0;
-		for(int i=0;i<this.dim;i++){
+		for(int i=0;i<Math.min(this.dim, p2.dim);i++){
 			
 			res+=(this.coord[i]-p2.coord[i])*(this.coord[i]-p2.coord[i]);
 		}
