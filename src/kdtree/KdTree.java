@@ -214,7 +214,7 @@ public class KdTree {
 	 * @return KdNode: the root of the created k-d tree 
 	 */
 	private KdNode createKdTree (List<Point> listePoints , int k , int profondeur,int pmax) {
-		//TODO probleme de cas d'egalite a corriger, si on a plus des points egaux au niveau d'une mediane ca pose probleme
+		//TODO probleme de cas d'egalite a corriger, si on a plus des points egaux au niveau d'une mediane ca pose probleme (solution temporaire en supprimant les doublons)
 		int size = listePoints.size();
 		final int direction = profondeur%k;
 		
@@ -228,10 +228,9 @@ public class KdTree {
 		
 		if(size > 2) {
 			//les listes étant triees on sait qu'elles sont du bon cote
-			
+    
 			res.filsGauche = createKdTree(listePoints.subList(0, listePoints.indexOf(point)) , k , profondeur+1,pmax);
 			res.filsDroit = createKdTree(listePoints.subList(listePoints.indexOf(point)+1 , size) , k , profondeur+1,pmax);
-			
 			return res;
 		}
 		else if (size == 2){
@@ -254,6 +253,7 @@ public class KdTree {
 	 * @param int k: the dimension k of the k-d tree
 	 */
 	public KdTree( List<Point> listePoints , int k,int pmax ) {
+
 		//petit ajout qui permet de supprimer les doublons en temps linéaire cependant ce n'est surement pas la bonne méthode
 		Set<Point> setPoints=new HashSet<Point>();
 		setPoints.addAll(listePoints);
@@ -394,8 +394,8 @@ public class KdTree {
 		}		
 	}
 	/**
-	 * @brief try to fill a list with 2^maxLayer colors, it starts the harvesting of colors at the level maxLayer
-	 *  if it is not enough, the search remade at maxLayer-1 etc
+	 * @brief try to fill a list with 2^maxLayer colors, the harvesting of colors starts at the level maxLayer
+	 *  if it is not enough, the search is remade at maxLayer-1 etc
 	 * @param maxLayer first search level
 	 * @return a List containing the colors
 	 */
@@ -426,12 +426,4 @@ public class KdTree {
 		}
 		return result;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 }

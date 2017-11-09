@@ -58,8 +58,8 @@ public class Quantification {
 		for(int i=0;i<nb_couleurs;i++){
 			palette.get(i).setOneCoord(3,i);
 		}
+    
 		KdTree tree_palette=new KdTree(palette,3,L2N_COLORS+1);
-		System.out.println(palette.size());
 		Point p=new Point(0,0,0);
 		Point g;
 		
