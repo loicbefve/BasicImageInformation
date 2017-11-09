@@ -14,9 +14,18 @@ public class App
 		ImageViewer mainWindow = new ImageViewer();
     
 	
-	
+	/*
 	//petit test des fonctions getNearest et Kdtree()
-	/*List<Point> li = new ArrayList<Point>();
+	List<Point> li = new ArrayList<Point>();
+	for(int i=0;i<12;i++){
+		//li.add(new Point((int)(Math.random()*100),(int)(Math.random()*100),(int)(Math.random()*100)));
+		li.add(new Point(10,10,10));
+		
+	}
+	//System.out.println(li.get(2)+" "+li.get(2)+" "+li.get(2).equals(li.get(1)));
+	//KdTree tree = new KdTree( li , 3,1000 );
+	
+	List<Point> li = new ArrayList<Point>();
 	for(int i=0;i<12;i++){
 		li.add(new Point((int)(Math.random()*100),(int)(Math.random()*100),(int)(Math.random()*100)));
 	}

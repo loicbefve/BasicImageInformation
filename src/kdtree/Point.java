@@ -12,8 +12,54 @@ public class Point {
 		this.dim = is.length;
 	}
 	
+	@Override
+	public boolean equals(Object p2){
+		//attention peut gener pour indexof!
+		if(this==p2) return true;
+		if(p2==null) return false;
+		if (getClass() != p2.getClass());
+			
+		Point p=(Point) p2;
+		if(p.dim!=dim){
+			return false;
+		}
+		if(coord==null){
+			if(p.coord!=null){
+				return false;
+			}
+		}
+		else{
+			for(int i=0;i<this.dim;i++){
+				if(coord[i]!=p.getCoord(i)){
+					return false;
+					}
+			}
+		
+		}
+		return true;
+		
+	}
+	@Override
+	public int hashCode(){
+		int h=0;
+		for(int i=0;i<this.dim;i++){
+			h += this.getCoord(i);
+			h += h<<10;
+			h ^= h>>6;
+			h += h << 3;
+			h ^= h >> 11;
+			h += h << 15;   
+			       
+		}
+		return h;
+	}
+	
 	public int getCoord( int dim ) {
 		return this.coord[dim];
+	}
+	
+	public int[] getCoords() {
+		return this.coord;
 	}
 	
 	public void setCoord(int ...c){

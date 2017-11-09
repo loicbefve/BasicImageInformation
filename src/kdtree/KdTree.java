@@ -214,7 +214,7 @@ public class KdTree {
 	 * @return KdNode: the root of the created k-d tree 
 	 */
 	private KdNode createKdTree (List<Point> listePoints , int k , int profondeur,int pmax) {
-		//TODO probleme de cas d'egalite a corriger, si on a plus des points egaux au niveau d'une mediane ca pose probleme
+		//TODO probleme de cas d'egalite a corriger, si on a plus des points egaux au niveau d'une mediane ca pose probleme (solution temporaire en supprimant les doublons)
 		int size = listePoints.size();
 		final int direction = profondeur%k;
 		
@@ -228,6 +228,7 @@ public class KdTree {
 		
 		if(size > 2) {
 			//les listes étant triees on sait qu'elles sont du bon cote
+    
 			res.filsGauche = createKdTree(listePoints.subList(0, listePoints.indexOf(point)) , k , profondeur+1,pmax);
 			res.filsDroit = createKdTree(listePoints.subList(listePoints.indexOf(point)+1 , size) , k , profondeur+1,pmax);
 			return res;
@@ -243,6 +244,8 @@ public class KdTree {
 			return res;
 		}
 	}
+	
+		
 	/**
 	 * Constructor of the class k-d tree
 	 *
@@ -251,6 +254,10 @@ public class KdTree {
 	 */
 	public KdTree( List<Point> listePoints , int k,int pmax ) {
 
+		//petit ajout qui permet de supprimer les doublons en temps linéaire cependant ce n'est surement pas la bonne méthode
+		Set<Point> setPoints=new HashSet<Point>();
+		setPoints.addAll(listePoints);
+		listePoints=new ArrayList<Point>(setPoints);
 		this.racine = createKdTree( listePoints , k , 0,pmax );
 	}
 	
@@ -279,16 +286,19 @@ public class KdTree {
 		return noeudParent.point == point;
 	}
 	
-	public void addNode( Point point ) {
+	public KdNode addNode( Point point,int k ) {
+		
 		KdNode noeudToAdd = new KdNode(point);
 		KdNode noeudParent = algoRecherche(this.racine , noeudToAdd);
 		int direction = noeudParent.direction;
+		noeudToAdd.direction=(noeudParent.direction+1)%k;
 		if(point.coord[direction] < noeudParent.point.coord[direction]) {
 			noeudParent.filsGauche = noeudToAdd;
 		}
 		else if(point.coord[direction] > noeudParent.point.coord[direction]) {
 			noeudParent.filsDroit = noeudToAdd;
 		}
+		return noeudParent;
 	}
 	
 	// TODO : Plus tard
@@ -383,37 +393,37 @@ public class KdTree {
 			
 		}		
 	}
-
-	public List<Point> getLayer(int n) {
+	/**
+	 * @brief try to fill a list with 2^maxLayer colors, the harvesting of colors starts at the level maxLayer
+	 *  if it is not enough, the search is remade at maxLayer-1 etc
+	 * @param maxLayer first search level
+	 * @return a List containing the colors
+	 */
+	public List<Point> getColors(int maxLayer) {
 		List<Point> result=new ArrayList<Point>();
-		return getLayer(result,racine,n);
-	}
-	
-	public List<Point> getLayer(List<Point> result,KdNode pere,int n){
+		int hl=0;
+		int nombreCouleursMax=1<<maxLayer;
 		
-		if(pere.isTerminal() && n!=0){
-			System.out.println("Attention, couche incomplete");
-		}
-		if(n==0){
-			result.add(pere.point);
-		}
-		if(pere.filsDroit!=null){
-			getLayer(result,pere.filsDroit,n-1);
-			
-		}
-		if(pere.filsGauche!=null){
-			getLayer(result,pere.filsGauche,n-1);
-			
+		while(hl<=maxLayer && result.size()<nombreCouleursMax){
+			getColors(result,racine,maxLayer,hl);
+			hl++;
 		}
 		
 		return result;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+	private List<Point> getColors(List<Point> result,KdNode pere,int maxLayer,int harvestLayer){
+		if(maxLayer==harvestLayer && pere!=null){
+			result.add(pere.point);
+		}
+		if(pere.filsDroit!=null){
+			getColors(result,pere.filsDroit,maxLayer-1,harvestLayer);
+			
+		}
+		if(pere.filsGauche!=null){
+			getColors(result,pere.filsGauche,maxLayer-1,harvestLayer);
+			
+		}
+		return result;
+	}
 }

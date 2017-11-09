@@ -10,11 +10,11 @@ import kdtree.*;
 
 /**
  * <p> Class used to compress a given image.</p> 
- * <p>the static value L2N_COLORS is log2 of the maximum number of colors we want in the color list </p>
+ * <p>the static value L2N_COLORS is log2 of the maximum number of colors we want in the color list, it should not be greater than 8 </p>
  */
 public class Quantification {
 	
-	public static final int L2N_COLORS=4;
+	public static final int L2N_COLORS=8;
 	/**
 	 * Public static function that returns the index of a given value in an array
 	 * @param int[] palette : array of integer
@@ -53,13 +53,13 @@ public class Quantification {
 		}
 		
 		KdTree tree=new KdTree(listePoints,3,L2N_COLORS+1);
-		List<Point> palette=tree.getLayer(L2N_COLORS);
+		List<Point> palette=tree.getColors(L2N_COLORS);
 		int nb_couleurs=palette.size();
 		for(int i=0;i<nb_couleurs;i++){
 			palette.get(i).setOneCoord(3,i);
 		}
-		KdTree tree_palette=new KdTree(palette,3,L2N_COLORS);
-		System.out.println(palette);
+    
+		KdTree tree_palette=new KdTree(palette,3,L2N_COLORS+1);
 		Point p=new Point(0,0,0);
 		Point g;
 		
