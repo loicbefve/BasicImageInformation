@@ -38,7 +38,23 @@ public class KdTreeTest {
 		
 		
 	}
-	
+	@Test
+	public void testAdd(){
+		
+		List<Point> pixels=new ArrayList<Point>();
+
+		Point p1=new Point(15,35,0,10);
+		pixels.add(p1);
+		KdTree tree=new KdTree(pixels,3,10);
+		
+		assertFalse(tree.addNode(p1,3));
+		
+		Point p2=new Point(15,34,0,15);
+
+		assertTrue(tree.addNode(p2,3));
+		
+		
+	}
 	
 
 }

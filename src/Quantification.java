@@ -31,7 +31,7 @@ public class Quantification {
 		return -1;
 	}
 	/**
-	 * Public static function that compress a given image. It indexes each pixel in an array of colors with a given size
+	 * Public static function that compress a given image. It indexes each pixel in an array of colors of size 2^L2N_COLORS
 	 * @param image
 	 * @return a compressed BufferedImage
 	 */
@@ -40,10 +40,11 @@ public class Quantification {
 		List<Point> listePoints =new ArrayList<Point>();//liste des pixels de l'image
 		int R=0;int V=0;int B=0;
 		Color pixelcolor; 
+		//creation d'une liste de points contenant tout les pixels 
 		for(int i=0;i<image.getWidth();i++){
 			
 			for(int j=0;j<image.getHeight();j++){
-				//on recupere la couleur
+				
 				pixelcolor=new Color(image.getRGB(i, j));
 				R=pixelcolor.getRed();
 				V=pixelcolor.getGreen();
@@ -51,20 +52,23 @@ public class Quantification {
 				listePoints.add(new Point(R,V,B,0));
 			}
 		}
-		
+		//on cree un Kdtree de la bonne taille avec tous les pixels de l'image
 		KdTree tree=new KdTree(listePoints,3,L2N_COLORS+1);
+		
+		//on remplit la palette, chaque point a un indice
 		List<Point> palette=tree.getColors(L2N_COLORS);
 		int nb_couleurs=palette.size();
 		for(int i=0;i<nb_couleurs;i++){
 			palette.get(i).setOneCoord(3,i);
 		}
-    
+		//cette fois on fait un Kdtree avec la palette sans prendre en compte la dimension de l index
 		KdTree tree_palette=new KdTree(palette,3,L2N_COLORS+1);
 		Point p=new Point(0,0,0);
 		Point g;
 		
 		int ig=0;
 		byte index[]=new byte[image.getWidth()*image.getHeight()];
+		//on cree une nouvelle liste de pixels en remplacant chaque pixels par l'indice de son voisin le plus proche dans la palette
 		for(int i=0;i<image.getHeight();i++){
 			for(int j=0;j<image.getWidth();j++){
 				

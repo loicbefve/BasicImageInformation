@@ -1,10 +1,18 @@
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-
+/**
+ * 
+ * This class contains a function which make a color inversion of an image
+ *
+ */
 public class Inversion {
 
-	
+	/**
+	 * 
+	 * @param imageInput a BufferedImage in which each Pixel is transformed, it is not modified
+	 * @return a BufferedImage in which each pixel is inverted
+	 */
 	public static BufferedImage inversion(BufferedImage imageInput){
 	
 		int width = imageInput.getWidth();

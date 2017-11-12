@@ -31,6 +31,7 @@ import sun.awt.image.ImageFormatException;
 
 public class CustomImage {
 	/**
+	 * Function which creates exceptions
 	 * 
 	 * @param message 
 	 * @param classe 
