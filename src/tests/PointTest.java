@@ -125,13 +125,8 @@ public class PointTest {
 	}
 
 	@Test
-	public void testToString() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	public void testDistsq() {
-		fail("Not yet implemented");
+		
 	}
 
 }
