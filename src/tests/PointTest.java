@@ -79,7 +79,49 @@ public class PointTest {
 
 	@Test
 	public void testSetOneCoord() {
-		fail("Not yet implemented");
+		int testValue;
+		int testPos;
+		
+		//Test1
+		testValue = -100000;
+		testPos = 6;
+		testPoint.setOneCoord(testPos, testValue);
+		assertTrue("Grande valeur négative" , testPoint.getCoord(testPos) == testValue);
+		
+		//Test2:
+		testValue = 100000;
+		testPos = 6;
+		testPoint.setOneCoord(testPos, testValue);
+		assertTrue("Grande valeur positive" , testPoint.getCoord(testPos) == testValue);
+		
+		//Test3:
+		testValue = 0;
+		testPos = 6;
+		testPoint.setOneCoord(testPos, testValue);
+		assertTrue("Valeur Zéro" , testPoint.getCoord(testPos) == testValue);
+		
+		//Test4:
+		testValue = 123;
+		testPos = 0;
+		testPoint.setOneCoord(testPos, testValue);
+		assertTrue("Position zéro" , testPoint.getCoord(testPos) == testValue);
+		
+		//Test5:
+		testValue = 123;
+		testPos = sizeTestPoint-1;
+		testPoint.setOneCoord(testPos, testValue);
+		assertTrue("Dernière position" , testPoint.getCoord(testPos) == testValue);
+		
+		//Test6:
+		for ( int i=0 ; i<100 ; i++) {
+			testValue = Integer.MIN_VALUE + (int)(Math.random() * ((Integer.MAX_VALUE - Integer.MIN_VALUE) + 1));
+			testPos = (int)(Math.random() * sizeTestPoint);
+			testPoint.setOneCoord(testPos, testValue);
+			assertTrue("100 valeurs et positions aléatoires" , testPoint.getCoord(testPos) == testValue);
+		}
+		
+		
+		
 	}
 
 	@Test
