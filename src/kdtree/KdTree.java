@@ -252,7 +252,7 @@ public class KdTree {
 	 * @param List<Point> listePoints: the list of point of the k-d tree 
 	 * @param int k: the dimension k of the k-d tree
 	 */
-	public KdTree( List<Point> listePoints , int k,int pmax ) {
+	public KdTree( List<Point> listePoints , int k, int pmax ) {
 
 		//petit ajout qui permet de supprimer les doublons en temps linéaire cependant ce n'est surement pas la bonne méthode
 		Set<Point> setPoints=new HashSet<Point>();
