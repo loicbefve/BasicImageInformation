@@ -251,6 +251,7 @@ public class KdTree {
 	 *
 	 * @param List<Point> listePoints: the list of point of the k-d tree 
 	 * @param int k: the dimension k of the k-d tree
+	 * @param int pmax the maximum number of layers
 	 */
 	public KdTree( List<Point> listePoints , int k,int pmax ) {
 

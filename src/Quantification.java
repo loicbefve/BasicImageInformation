@@ -14,7 +14,7 @@ import kdtree.*;
  */
 public class Quantification {
 	
-	public static final int L2N_COLORS=8;
+	public static final int L2N_COLORS=4;
 	/**
 	 * Public static function that returns the index of a given value in an array
 	 * @param int[] palette : array of integer
