@@ -123,60 +123,6 @@ public class KdTree {
 	}
 	
 	/**
-	 * Private function which returns the list of points given but 
-	 * sorted by the direction given.
-	 *
-	 * @param List<Point> listePoints: the list of point to be sorted 
-	 * @param int direction: an integer representing the coordinate of the point
-	 * which is use to sort the list
-	 * @return List<Point> ret the initial list of point sorted by direction
-	 * this function call the private function fusion recursively. 
-	 */
-	@SuppressWarnings("unused")
-	private List<Point> tri( List<Point> listePoints , int direction ) {
-		//Tri de la liste par tri/fusion
-		int size = listePoints.size();
-		if( size <= 1) {
-			return listePoints;
-		}
-		else {
-			List<Point> listeGauche = listePoints.subList(0, size/2);
-			List<Point> listeDroite = listePoints.subList(size/2, size);
-			return fusion( tri(listeGauche , direction) , tri(listeDroite , direction) , direction);
-		}
-	}
-	
-	private List<Point> fusion(List<Point> listeA, List<Point> listeB , int direction) {
-		if( listeA == null ) {
-			return listeB;
-		}
-		if( listeB == null ) {
-			return listeA;
-		}
-		if( listeA.get(0).coord[direction] <= listeB.get(0).coord[direction] ) {
-			List<Point> ret = new ArrayList<Point>();
-			ret.add(listeA.get(0));
-			if(listeA.size() > 1) {
-				ret.addAll(fusion(listeA.subList(1, listeA.size()) , listeB , direction));
-			}
-			else {
-				ret.addAll(fusion( null , listeB , direction));
-			}
-			return ret;
-		}
-		else {
-			List<Point> ret = new ArrayList<Point>();
-			ret.add(listeB.get(0));
-			if(listeB.size() > 1) {
-				ret.addAll(fusion(listeA , listeB.subList(1, listeB.size()) , direction));
-			}
-			else {
-				ret.addAll(fusion(listeA , null , direction));
-			}
-			return ret;
-		}
-	}
-	/**
 	 * Private function which returns the median point of a list of point sorted
 	 * by a direction.
 	 *
@@ -258,7 +204,7 @@ public class KdTree {
 	 * @param int k: the dimension k of the k-d tree
 	 * @param int pmax the maximum number of layers
 	 */
-	public KdTree( List<Point> listePoints , int k,int pmax ) {
+	public KdTree( List<Point> listePoints , int k, int pmax ) {
 
 		//petit ajout qui permet de supprimer les doublons en temps linéaire, 
 		//peut être est il tout simplement possible de gerer les cas d'egalite des points dans la fonction createKdTree
