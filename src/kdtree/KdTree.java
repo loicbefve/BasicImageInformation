@@ -18,7 +18,7 @@ public class KdTree {
 	
 	/**
 	 * 
-	 * <p>Each vector is stored in a Kdnode, a Kdnode is linked to at most 2 others Kdnodes, 
+	 * <p>Each vector is stored in a Kdnode, a Kdnode is linked to 2 others Kdnodes (that can be null), 
 	 * they are used to order the vector along one dimension.
 	 *</p>
 	 */
@@ -64,9 +64,13 @@ public class KdTree {
 	
 	public KdNode racine;
 
+	/**
+	 * method used to print the KdTree nicely,
+	 * it only the 4 first layers
+	 */
 	public String toString(){
 		
-		int profondeur=6;
+		int profondeur=4;
 		int parcours=0;
 		String chemin="";
 		boolean n=false;
@@ -118,7 +122,6 @@ public class KdTree {
 		return res;
 	}
 	
-
 	/**
 	 * Private function which returns the median point of a list of point sorted
 	 * by a direction.
@@ -199,10 +202,13 @@ public class KdTree {
 	 *
 	 * @param List<Point> listePoints: the list of point of the k-d tree 
 	 * @param int k: the dimension k of the k-d tree
+	 * @param int pmax the maximum number of layers
 	 */
 	public KdTree( List<Point> listePoints , int k, int pmax ) {
 
-		//petit ajout qui permet de supprimer les doublons en temps linéaire cependant ce n'est surement pas la bonne méthode
+		//petit ajout qui permet de supprimer les doublons en temps linéaire, 
+		//peut être est il tout simplement possible de gerer les cas d'egalite des points dans la fonction createKdTree
+		//TODO ne gere pas egalite selon une seule dimension
 		Set<Point> setPoints=new HashSet<Point>();
 		setPoints.addAll(listePoints);
 		listePoints=new ArrayList<Point>(setPoints);
@@ -210,43 +216,71 @@ public class KdTree {
 	}
 	
 	private KdNode algoRecherche( KdNode noeudDepart, KdNode noeudCherch ) {
+		
 		int direction = noeudDepart.direction;
-		if( noeudDepart.point == noeudCherch.point ) {
+		
+		if( noeudDepart.point.equals(noeudCherch.point) ) {
 			return noeudDepart;
 		}
-		else if(noeudCherch.point.coord[direction] > noeudDepart.point.coord[direction] && noeudDepart.filsDroit != null) {
-			algoRecherche(noeudDepart.filsDroit , noeudCherch);
+		else if(noeudCherch.point.coord[direction] <= noeudDepart.point.coord[direction]) {
+			
+			if(noeudDepart.filsGauche==null){
+				
+				return noeudDepart;
+			}
+			else{
+				return algoRecherche(noeudDepart.filsGauche , noeudCherch);
+			}
 		}
-		else if(noeudCherch.point.coord[direction] < noeudDepart.point.coord[direction] && noeudDepart.filsGauche != null) {
-			algoRecherche(noeudDepart.filsGauche , noeudCherch);
+		else if(noeudCherch.point.coord[direction] >= noeudDepart.point.coord[direction]) {
+			if(noeudDepart.filsDroit == null){
+				return noeudDepart;
+			}
+			else{
+				return algoRecherche(noeudDepart.filsDroit , noeudCherch);
+			}
 		}
-		else if(noeudDepart.isTerminal() ) {
-			return noeudDepart;
-		}
+		
 		System.out.println("Cas non géré");
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param Point point the vector we are looking for in the tree
+	 * @return true if the vector is in the tree, false otherwise
+	 */
 	public boolean recherche( Point point  ) {
 		KdNode noeudCherch = new KdNode(point);
 		KdNode noeudParent = algoRecherche(this.racine , noeudCherch);
 		System.out.println("Parent:"+noeudParent.point+" Point:"+point);
-		return noeudParent.point == point;
+		return noeudParent.point.equals(point);
 	}
 	
-	public KdNode addNode( Point point,int k ) {
+	/**
+	 * Add a vector in the tree, if it is already in, does nothing
+	 * @param Point point vector we want to add in the tree
+	 * @param k number of dimensions we 
+	 * @return
+	 */
+	public boolean addNode( Point point,int k ) {
 		
 		KdNode noeudToAdd = new KdNode(point);
 		KdNode noeudParent = algoRecherche(this.racine , noeudToAdd);
+		if(noeudParent.point.equals(point)){
+			return false;
+		}
 		int direction = noeudParent.direction;
 		noeudToAdd.direction=(noeudParent.direction+1)%k;
-		if(point.coord[direction] < noeudParent.point.coord[direction]) {
+		if(point.coord[direction] <= noeudParent.point.coord[direction]) {
 			noeudParent.filsGauche = noeudToAdd;
+			return true;
 		}
-		else if(point.coord[direction] > noeudParent.point.coord[direction]) {
+		else if(point.coord[direction] >= noeudParent.point.coord[direction]) {
 			noeudParent.filsDroit = noeudToAdd;
+			return true;
 		}
-		return noeudParent;
+		return false;
 	}
 	
 	// TODO : Plus tard
@@ -282,7 +316,7 @@ public class KdTree {
 		Point estimation1=null,estimation2=null,nearest=null;
 		KdNode restant=null;
 		//distance par rapport a l'hyperplan
-		if(pere.filsGauche!=null && point_a_placer.getCoord(pere.direction)<pere.point.getCoord(pere.direction)){
+		if(pere.filsGauche!=null && point_a_placer.getCoord(pere.direction)<=pere.point.getCoord(pere.direction)){
 			estimation1=getNearestNeighbor(pere.filsGauche,point_a_placer,distance);
 			if(pere.filsDroit!=null){
 				restant=pere.filsDroit;
@@ -309,8 +343,6 @@ public class KdTree {
 		}
 		
 		return nearest;
-		
-			
 		
 	}
 	/**
