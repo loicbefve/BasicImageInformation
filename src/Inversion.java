@@ -22,24 +22,24 @@ public class Inversion {
 		for (int i = 0; i < width; i++) {
 		    for (int j = 0; j < height; j++) {
 			         
-		      	//Je récupère la couleur de chaque pixel
+		      	//Getting color of each pixel
 			    Color pixelcolor= new Color(imageInput.getRGB(i, j));
 			           
-			    //Je récupère chaque composante
+			    //Getting each component
 			    int r=pixelcolor.getRed();
 			    int g=pixelcolor.getGreen();
 			    int b=pixelcolor.getBlue();
 			             
-			    //J'inverse les couleurs
+			    //Inverting colors
 			    r=Math.abs(r-255);
 			    g=Math.abs(g-255);
 			    b=Math.abs(b-255);
 			            
-			    //Je repasse en int
+			    //Going back to int
 			    Color rgbNew = new Color(r,g,b);
 			    int rgb = rgbNew.getRGB();
 			             
-			    //Je modifie l'output
+			    //Modifying output
 			    imageOutput.setRGB(i, j, rgb);
 			}
 		}

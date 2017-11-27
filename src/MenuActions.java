@@ -29,7 +29,7 @@ public class MenuActions {
 			try{	
 				String[] n=name.split("\\.");
 				
-				if(n.length==2 && n[1].equals("cst")){//si c'est une image custom avec un nom propre
+				if(n.length==2 && n[1].equals("cst")){//if custom Image 
 					CustomImage.write(image,name);
 					System.out.println("Format cst");
 					b=true;

@@ -62,14 +62,14 @@ public class CustomImage {
 		try{
 			File fichier=new File(filename);
 			FileWriter fw = new FileWriter(fichier);
-			//on reccupere les donnees necessaires
+			//getting useful data
 			IndexColorModel cm;
 			try{
 				cm=(IndexColorModel)image.getColorModel();
 			}
 			catch(Exception f){
 				fw.close();
-				String message="Mauvais format de color model";
+				String message="Wrong color model format";
 				throw makeException(message,"CustomImage","write",62);
 			}
 			int msize=cm.getMapSize();
@@ -77,7 +77,7 @@ public class CustomImage {
 			int[] palette=new int[msize];
 			cm.getRGBs(palette);
 			
-			//on ecrit l'entete : nombre magique, dimensions, nombre de bits par pixels, palette des couleurs
+			//writing the header : magic number, dimensions, number of bits per pixels, palette of colors
 			fw.write("P10\n");
 			fw.write(image.getWidth()+" "+image.getHeight()+"\n");
 			fw.write(Integer.toString(psize)+"\n");
@@ -88,7 +88,7 @@ public class CustomImage {
 			fw.write(Integer.toHexString(palette[msize-1]&0x00FFFFFF));
 			fw.write("\n");
 			
-			//on ecrit les pixels
+			//writing pixels
 			for(int i=0;i<image.getHeight();i++){
 				for(int j=0;j<image.getWidth();j++){
 					
@@ -117,19 +117,19 @@ public class CustomImage {
 		String nm="",pal="",dims="",pixel_size="";
 		InputStream flux;
 		
-		//peut renvoyer une FileNotFoundException
+		//can throw FileNotFoundException
 		flux=new FileInputStream(filename); 
 		
-		InputStreamReader lecture=new InputStreamReader(flux);
-		BufferedReader buff=new BufferedReader(lecture);
+		InputStreamReader reader=new InputStreamReader(flux);
+		BufferedReader buff=new BufferedReader(reader);
 		
-		//peut renvoyer une IOException
+		//can throw IOException
 		nm=buff.readLine();
 		
 		if(nm==null || !nm.equals("P10")){
-			//peut renvoyer une IOException
-			buff.close();lecture.close();flux.close();
-			String message="Mauvais format d'image! type="+nm+", type attendu= P10";
+			//can throw IOException
+			buff.close();reader.close();flux.close();
+			String message="Wrong image format! found="+nm+", expected= P10";
 			throw makeException(message,"CustomImage","read",122);
 		}
 
@@ -142,8 +142,8 @@ public class CustomImage {
 			h=Integer.parseInt(wh[1]);
 		}
 		catch(Exception e){
-			buff.close();lecture.close();flux.close();
-			String message="Mauvais format longueur/hauteur, type="+dims+", type attendu= int int";
+			buff.close();reader.close();flux.close();
+			String message="Wrong width/height, found="+dims+", expected= int int";
 			throw makeException(message,"CustomImage","read",134);
 		}
 		
@@ -154,13 +154,13 @@ public class CustomImage {
 		ps=Integer.parseInt(pixel_size);
 		}
 		catch(NumberFormatException f){
-			buff.close();lecture.close();flux.close();
-			String message="Mauvais format pixel size, type="+pixel_size+", type attendu= int";
+			buff.close();reader.close();flux.close();
+			String message="Wrong pixel size, found="+pixel_size+", expected= int";
 			throw makeException(message,"CustomImage","read",149);
 		}
 		if(ps>8){
-			buff.close(); lecture.close();flux.close();
-			String message="Pixel size trop grande! "+ps+">8bits, lecture impossible";
+			buff.close(); reader.close();flux.close();
+			String message="Pixel size too big! "+ps+">8bits, impossible reading";
 			throw makeException(message,"CustomImage","read",149);
 		}
 		
@@ -169,17 +169,17 @@ public class CustomImage {
 		
 		byte[] pixels = new byte[w*h];
 		int a=0,z=0;
-		while((a=buff.read())!=-1){//si a=-1 on arrive a la fin du fichier
+		while((a=buff.read())!=-1){//if a=-1,EOF
 			
 			try{pixels[z++]=(byte)a;}
 			catch(ArrayIndexOutOfBoundsException f){
-				buff.close(); lecture.close();flux.close();
-				String message="Trop de pixels,longueur*hauteur";
+				buff.close(); reader.close();flux.close();
+				String message="Too many pixels";
 				throw  makeException(message,"CustomImage","read",169);
 			}	
 		}
 	
-		buff.close(); lecture.close();flux.close();
+		buff.close(); reader.close();flux.close();
 			
 		byte r[]=new byte[palette.length];
 		byte v[]=new byte[palette.length];
@@ -188,9 +188,8 @@ public class CustomImage {
 		int c=0;
 		try{
 			for(int i=0;i<palette.length;i++){
-				//on prepare les donnees du color model
-				//peut renvoyer NumberFormatException
-			
+				//preparing color model data
+				//can throw NumberFormatException
 				c=Integer.parseInt(palette[i],16);
 			
 			
@@ -200,7 +199,7 @@ public class CustomImage {
 			}
 		}
 		catch(NumberFormatException f){
-			String message="mauvais format pour une couleur de la palette attendu=0xRRGGBB";
+			String message="wrong format for a palette color expected=0xRRGGBB";
 			throw  makeException(message,"CustomImage","read",187);
 		}
 		DataBufferByte dataBuffer = new DataBufferByte(pixels, w*h);

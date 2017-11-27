@@ -24,8 +24,8 @@ public class KdTree {
 	 */
 	private class KdNode {
 			
-			private KdNode filsDroit;
-			private KdNode filsGauche;
+			private KdNode rightChild;
+			private KdNode leftChild;
 			private int direction;
 			Point point;
 			
@@ -40,8 +40,8 @@ public class KdTree {
 			public KdNode(Point point){
         
 				this.direction=-1; 
-				this.filsDroit=null;
-				this.filsGauche=null;
+				this.rightChild=null;
+				this.leftChild=null;
 				this.point = point;
   
 			}
@@ -51,18 +51,16 @@ public class KdTree {
 			 *
 			 * @return      a boolean true:terminal , false:not terminal
 			 */
+			@SuppressWarnings("unused")
 			public boolean isTerminal(){
 				
-				return (filsDroit==null && filsGauche==null);
+				return (rightChild==null && leftChild==null);
 			}
 			
-			private int distsq(Point point){
-				return this.point.distsq(point);
-			}
 			
 		}
 	
-	public KdNode racine;
+	public KdNode root;
 
 	/**
 	 * method used to print the KdTree nicely,
@@ -70,36 +68,36 @@ public class KdTree {
 	 */
 	public String toString(){
 		
-		int profondeur=4;
-		int parcours=0;
+		int depth=4;
+		int path=0;
 		String chemin="";
 		boolean n=false;
 		
-		for(int p=0;p<profondeur;p++){
-		//on affiche les profondeurs une à une
-			parcours=0;
-			KdNode r=racine;
+		for(int p=0;p<depth;p++){
+		//printiong depths one by one
+			path=0;
+			KdNode r=root;
 			String str="";
 			for(int j=0;j<(1<<p);j++){
-			//pour les 2^p noeuds
+			//for the 2^p nodes
 				for(int i=0;i<p;i++){
-					if((parcours & (1<<i))==0){
-					//permet de faire toutes les possibilités
-						if(r.filsDroit==null){
+					if((path & (1<<i))==0){
+					//exploring the tree
+						if(r.rightChild==null){
 							n=true;
 						}
 						else{
-							r=r.filsDroit;
-							chemin+="D";
+							r=r.rightChild;
+							chemin+="R";
 						}
 					}
 					else{
-						if(r.filsGauche==null){
+						if(r.leftChild==null){
 							n=true;
 						}
 						else{
-							r=r.filsGauche;
-							chemin+="G";
+							r=r.leftChild;
+							chemin+="L";
 						}
 					}
 					str+="\t\t";
@@ -112,9 +110,9 @@ public class KdTree {
 				else{
 					System.out.println(chemin+": "+r);
 				}
-				r=racine;
+				r=root;
 				str="";
-				parcours++;
+				path++;
 				chemin="";
 			}
 		}
@@ -126,14 +124,14 @@ public class KdTree {
 	 * Private function which returns the median point of a list of point sorted
 	 * by a direction.
 	 *
-	 * @param List<Point> listePointsTriee: the list of sorted points where we want the median
+	 * @param List<Point> listOfPointsTriee: the list of sorted points where we want the median
 	 * @param int direction: an integer representing the coordinate of the point that we have interest for
 	 * @return Point: the median point of the sorted list
 	 */
-	private Point mediane( List<Point> listePoints , int direction) {
-		//TODO: Refaire la doc
+	private Point median( List<Point> listOfPoints , int direction) {
+		
 		final int dir = direction;
-		listePoints.sort(new Comparator<Point>() {
+		listOfPoints.sort(new Comparator<Point>() {
 		    @Override
 		    public int compare(Point p1, Point p2) {
 		        if(p1.getCoord(dir) > p2.getCoord(dir)){
@@ -146,52 +144,52 @@ public class KdTree {
 		     }
 		});
 		
-		if(listePoints.size() > 0) {
-			if(listePoints.size()%2 != 0) {
-				return listePoints.get(listePoints.size()/2);
+		if(listOfPoints.size() > 0) {
+			if(listOfPoints.size()%2 != 0) {
+				return listOfPoints.get(listOfPoints.size()/2);
 			}
-			return listePoints.get(listePoints.size()/2-1);
+			return listOfPoints.get(listOfPoints.size()/2-1);
 		}
 		else {
-			return listePoints.get(0);
+			return listOfPoints.get(0);
 		}
 	}
 	/**
 	 * Private recursive function which create a k-d tree
 	 *
-	 * @param List<Point> listePoints: the list of point of the k-d tree 
+	 * @param List<Point> listOfPoints: the list of point of the k-d tree 
 	 * @param int k: the dimension k of the k-d tree
-	 * @param int profondeur: the stage that we are creating
+	 * @param int depth: the stage that we are creating
 	 * @return KdNode: the root of the created k-d tree 
 	 */
-	private KdNode createKdTree (List<Point> listePoints , int k , int profondeur,int pmax) {
+	private KdNode createKdTree (List<Point> listOfPoints , int k , int depth,int pmax) {
 		//TODO probleme de cas d'egalite a corriger, si on a plus des points egaux au niveau d'une mediane ca pose probleme (solution temporaire en supprimant les doublons)
-		int size = listePoints.size();
-		final int direction = profondeur%k;
+		int size = listOfPoints.size();
+		final int direction = depth%k;
 		
-		if( listePoints.isEmpty() || profondeur==pmax) {
+		if( listOfPoints.isEmpty() || depth==pmax) {
 			return null;
 		}
 		
-		Point point = mediane(listePoints , direction);
+		Point point = median(listOfPoints , direction);
 		KdNode res = new KdNode(point);
 		res.direction = direction;
 		
 		if(size > 2) {
-			//les listes étant triees on sait qu'elles sont du bon cote
+			//list are sorted so the points are on the right side
     
-			res.filsGauche = createKdTree(listePoints.subList(0, listePoints.indexOf(point)) , k , profondeur+1,pmax);
-			res.filsDroit = createKdTree(listePoints.subList(listePoints.indexOf(point)+1 , size) , k , profondeur+1,pmax);
+			res.leftChild = createKdTree(listOfPoints.subList(0, listOfPoints.indexOf(point)) , k , depth+1,pmax);
+			res.rightChild = createKdTree(listOfPoints.subList(listOfPoints.indexOf(point)+1 , size) , k , depth+1,pmax);
 			return res;
 		}
 		else if (size == 2){
-			res.filsGauche = null;
-			res.filsDroit = createKdTree(listePoints.subList(listePoints.indexOf(point)+1 , size) , k , profondeur+1,pmax);
+			res.leftChild = null;
+			res.rightChild = createKdTree(listOfPoints.subList(listOfPoints.indexOf(point)+1 , size) , k , depth+1,pmax);
 			return res;
 		}
 		else {
-			res.filsDroit = null;
-			res.filsGauche = null;
+			res.rightChild = null;
+			res.leftChild = null;
 			return res;
 		}
 	}
@@ -200,44 +198,42 @@ public class KdTree {
 	/**
 	 * Constructor of the class k-d tree
 	 *
-	 * @param List<Point> listePoints: the list of point of the k-d tree 
+	 * @param List<Point> listOfPoints: the list of point of the k-d tree 
 	 * @param int k: the dimension k of the k-d tree
 	 * @param int pmax the maximum number of layers
 	 */
-	public KdTree( List<Point> listePoints , int k, int pmax ) {
+	public KdTree( List<Point> listOfPoints , int k, int pmax ) {
 
-		//petit ajout qui permet de supprimer les doublons en temps linéaire, 
-		//peut être est il tout simplement possible de gerer les cas d'egalite des points dans la fonction createKdTree
 		//TODO ne gere pas egalite selon une seule dimension
-		Set<Point> setPoints=new HashSet<Point>();
-		setPoints.addAll(listePoints);
-		listePoints=new ArrayList<Point>(setPoints);
-		this.racine = createKdTree( listePoints , k , 0,pmax );
+		Set<Point> setPoints=new HashSet<Point>();//deleting doubles complexity : O(n)
+		setPoints.addAll(listOfPoints);
+		listOfPoints=new ArrayList<Point>(setPoints);
+		this.root = createKdTree( listOfPoints , k , 0,pmax );
 	}
 	
-	private KdNode algoRecherche( KdNode noeudDepart, KdNode noeudCherch ) {
+	private KdNode algoRecherche( KdNode startingNode, KdNode searchedNode ) {
 		
-		int direction = noeudDepart.direction;
+		int direction = startingNode.direction;
 		
-		if( noeudDepart.point.equals(noeudCherch.point) ) {
-			return noeudDepart;
+		if( startingNode.point.equals(searchedNode.point) ) {
+			return startingNode;
 		}
-		else if(noeudCherch.point.coord[direction] <= noeudDepart.point.coord[direction]) {
+		else if(searchedNode.point.coord[direction] <= startingNode.point.coord[direction]) {
 			
-			if(noeudDepart.filsGauche==null){
+			if(startingNode.leftChild==null){
 				
-				return noeudDepart;
+				return startingNode;
 			}
 			else{
-				return algoRecherche(noeudDepart.filsGauche , noeudCherch);
+				return algoRecherche(startingNode.leftChild , searchedNode);
 			}
 		}
-		else if(noeudCherch.point.coord[direction] >= noeudDepart.point.coord[direction]) {
-			if(noeudDepart.filsDroit == null){
-				return noeudDepart;
+		else if(searchedNode.point.coord[direction] >= startingNode.point.coord[direction]) {
+			if(startingNode.rightChild == null){
+				return startingNode;
 			}
 			else{
-				return algoRecherche(noeudDepart.filsDroit , noeudCherch);
+				return algoRecherche(startingNode.rightChild , searchedNode);
 			}
 		}
 		
@@ -251,10 +247,10 @@ public class KdTree {
 	 * @return true if the vector is in the tree, false otherwise
 	 */
 	public boolean recherche( Point point  ) {
-		KdNode noeudCherch = new KdNode(point);
-		KdNode noeudParent = algoRecherche(this.racine , noeudCherch);
-		System.out.println("Parent:"+noeudParent.point+" Point:"+point);
-		return noeudParent.point.equals(point);
+		KdNode searchedNode = new KdNode(point);
+		KdNode fatherNode = algoRecherche(this.root , searchedNode);
+		System.out.println("Parent:"+fatherNode.point+" Point:"+point);
+		return fatherNode.point.equals(point);
 	}
 	
 	/**
@@ -266,18 +262,18 @@ public class KdTree {
 	public boolean addNode( Point point,int k ) {
 		
 		KdNode noeudToAdd = new KdNode(point);
-		KdNode noeudParent = algoRecherche(this.racine , noeudToAdd);
-		if(noeudParent.point.equals(point)){
+		KdNode fatherNode = algoRecherche(this.root , noeudToAdd);
+		if(fatherNode.point.equals(point)){
 			return false;
 		}
-		int direction = noeudParent.direction;
-		noeudToAdd.direction=(noeudParent.direction+1)%k;
-		if(point.coord[direction] <= noeudParent.point.coord[direction]) {
-			noeudParent.filsGauche = noeudToAdd;
+		int direction = fatherNode.direction;
+		noeudToAdd.direction=(fatherNode.direction+1)%k;
+		if(point.coord[direction] <= fatherNode.point.coord[direction]) {
+			fatherNode.leftChild = noeudToAdd;
 			return true;
 		}
-		else if(point.coord[direction] >= noeudParent.point.coord[direction]) {
-			noeudParent.filsDroit = noeudToAdd;
+		else if(point.coord[direction] >= fatherNode.point.coord[direction]) {
+			fatherNode.rightChild = noeudToAdd;
 			return true;
 		}
 		return false;
@@ -293,83 +289,67 @@ public class KdTree {
 	 */
 	public Point getNearestNeighbor( Point point ) {
 		
-		Integer distance=Integer.MAX_VALUE;
-		return getNearestNeighbor(racine,point,distance);
+		if(root==null){
+			return null;
+		}
+		return getNearestNeighbor(root,point,root.point);
 		
 	} 
 	/**
 	 * Private function
 	 *
-	 * @param KdNode pere: a node of the tree
+	 * @param KdNode father: a node of the tree
 	 * @param KdNode node: the node that needs to find its nearest neighbor
 	 */	
 	
-	private Point getNearestNeighbor(KdNode pere,Point point_a_placer,Integer distance){
+	private Point getNearestNeighbor(KdNode father,Point newPoint,Point candidate/*ou Point pointproche*/){
 		
-		if(pere.isTerminal()){
-			return pere.point;
+		if(newPoint.distsq(father.point)<newPoint.distsq(candidate)){
+			candidate=father.point;
+		}
+		//if it's greater than 0 father<point => searching right
+		int dist1D=newPoint.getCoord(father.direction)-father.point.getCoord(father.direction);
+		
+		KdNode n1=(dist1D>0)?father.rightChild:father.leftChild;
+		KdNode n2=(dist1D<=0)?father.rightChild:father.leftChild;
+		
+		if(n1!=null){
+			candidate=getNearestNeighbor(n1,newPoint,candidate);
+	
+		}
+		if(n2!=null && dist1D*dist1D<newPoint.distsq(candidate)){
+			candidate=getNearestNeighbor(n2,newPoint,candidate);
+
 		}
 		
-		int dpere=pere.distsq(point_a_placer);
-		distance=Math.min(dpere,distance);
-		
-		Point estimation1=null,estimation2=null,nearest=null;
-		KdNode restant=null;
-		//distance par rapport a l'hyperplan
-		if(pere.filsGauche!=null && point_a_placer.getCoord(pere.direction)<=pere.point.getCoord(pere.direction)){
-			estimation1=getNearestNeighbor(pere.filsGauche,point_a_placer,distance);
-			if(pere.filsDroit!=null){
-				restant=pere.filsDroit;
-			}
-		}
-		else if(pere.filsDroit!=null){
-			estimation1=getNearestNeighbor(pere.filsDroit,point_a_placer,distance);
-			if(pere.filsGauche!=null){
-				restant=pere.filsGauche;
-			}
-		}
-		
-		if(restant!= null && Math.abs(pere.point.getCoord(pere.direction)-point_a_placer.getCoord(pere.direction))<distance){
-			estimation2=getNearestNeighbor(restant,point_a_placer,distance);
-		}
-		
-		if(estimation2!=null && estimation2.distsq(point_a_placer)<estimation1.distsq(point_a_placer)){
-			nearest=estimation2;
-		}
-		else nearest=estimation1;
-		
-		if(dpere<nearest.distsq(point_a_placer)){
-			nearest=pere.point;
-		}
-		
-		return nearest;
+		return candidate;
 		
 	}
 	/**
 	 * Public fonction which cut a tree to a given depth
 	 * 
-	 * @param KdNode pere : at the first call it should be the root of the tree
-	 * @param int prof : the number of layers we want to keep
+	 * @param KdNode father : at the first call it should be the root of the tree
+	 * @param int depth : the number of layers we want to keep
 	 */
-	public void troncature(KdNode pere,int prof) {
+	public void truncation(KdNode father,int depth) {
 		
-		if(prof==0){
-			if(pere==null){
-				System.out.println("troncature ratée");
+		if(depth==0){
+			if(father==null){
+				System.out.println("error while cutting");
 				return;
 			}
-			pere.filsDroit=null;
-			pere.filsGauche=null;
+			father.rightChild=null;
+			father.leftChild=null;
 			return;
 		}
 		
-		else if(pere.filsGauche==null || pere.filsDroit==null){
-			System.out.println("troncature ratée");
+		else if(father.leftChild==null || father.rightChild==null){
+			System.out.println("error while cutting");
 			
 		}
 		else{
-			troncature(pere.filsDroit,prof-1);
-			troncature(pere.filsGauche,prof-1);
+			truncation(father.rightChild,depth-1);
+			truncation(father.leftChild,depth-1);
 			
 		}		
 	}
@@ -382,26 +362,26 @@ public class KdTree {
 	public List<Point> getColors(int maxLayer) {
 		List<Point> result=new ArrayList<Point>();
 		int hl=0;
-		int nombreCouleursMax=1<<maxLayer;
+		int numberOfColorsMax=1<<maxLayer;
 		
-		while(hl<=maxLayer && result.size()<nombreCouleursMax){
-			getColors(result,racine,maxLayer,hl);
+		while(hl<=maxLayer && result.size()<numberOfColorsMax){
+			getColors(result,root,maxLayer,hl);
 			hl++;
 		}
 		
 		return result;
 	}
 	
-	private List<Point> getColors(List<Point> result,KdNode pere,int maxLayer,int harvestLayer){
-		if(maxLayer==harvestLayer && pere!=null){
-			result.add(pere.point);
+	private List<Point> getColors(List<Point> result,KdNode father,int maxLayer,int harvestLayer){
+		if(maxLayer==harvestLayer && father!=null){
+			result.add(father.point);
 		}
-		if(pere.filsDroit!=null){
-			getColors(result,pere.filsDroit,maxLayer-1,harvestLayer);
+		if(father.rightChild!=null){
+			getColors(result,father.rightChild,maxLayer-1,harvestLayer);
 			
 		}
-		if(pere.filsGauche!=null){
-			getColors(result,pere.filsGauche,maxLayer-1,harvestLayer);
+		if(father.leftChild!=null){
+			getColors(result,father.leftChild,maxLayer-1,harvestLayer);
 			
 		}
 		return result;

@@ -1,7 +1,5 @@
 package kdtree;
 
-//import kdtree.KdTree.KdNode;
-
 public class Point {
 
 	int dim = 0;
@@ -12,9 +10,17 @@ public class Point {
 		this.dim = is.length;
 	}
 	
+	public Point(Point p){
+		dim=p.dim;
+		coord=new int[dim];
+		for(int i=0;i<p.coord.length;i++){
+			coord[i]=p.coord[i];
+		}
+	}
+	
 	@Override
 	public boolean equals(Object p2){
-		//attention peut gener pour indexof!
+		//can be a problem to indexof!
 		if(this==p2) return true;
 		if(p2==null) return false;
 		if (getClass() != p2.getClass());

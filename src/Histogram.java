@@ -10,7 +10,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 /**
  * <p> This class contains a static method required to create an histogram of R-G-B pixels within an image</p>
  */
-public class Histogramme{
+public class Histogram{
 	
 	private static int max(int a,int b, int c){
 		if(a>=b && a>=c){
@@ -34,48 +34,49 @@ public class Histogramme{
 		
 		int h=im.getHeight();
 		int w=im.getWidth();
-		int R=0;int V=0;int B=0;
-		int nR=0;int nV=0;int nB=0;
+		int R=0;int G=0;int B=0;
+		int nR=0;int nG=0;int nB=0;
+		
 		for(int i=0;i<w;i++){
 			for(int j=0;j<h;j++){
 				
 			    Color pixelcolor= new Color(im.getRGB(i, j));
 			      
 			    R=pixelcolor.getRed();
-			    V=pixelcolor.getGreen();
+			    G=pixelcolor.getGreen();
 			    B=pixelcolor.getBlue();
 				
-				if(max(R,V,B)==R){
+				if(max(R,G,B)==R){
 					nR++;
 				}
-				else if(max(R,V,B)==B){
+				else if(max(R,G,B)==B){
 					nB++;
 				}
 				else{
-					nV++;
+					nG++;
 				}
 			}
 		}
-		//on cree une nouvelle fenetre
-		JFrame fenetre_histogramme=new JFrame(); 
-		fenetre_histogramme.setSize(400,300);
-		//on cree notre zone d affichage
+		//creating a new Frame
+		JFrame histogram_window=new JFrame(); 
+		histogram_window.setSize(400,300);
+		//creating Panel
 		JPanel pan=new JPanel();
-		fenetre_histogramme.getContentPane().add(pan);
+		histogram_window.getContentPane().add(pan);
 		pan.setLayout(new java.awt.BorderLayout());
 		
 		
 		DefaultCategoryDataset data=new DefaultCategoryDataset();
-		data.addValue(nR,"rouge","color");
-		data.addValue(nB,"bleu","color");
-		data.addValue(nV,"vert","color");
+		data.addValue(nR,"red","color");
+		data.addValue(nB,"blue","color");
+		data.addValue(nG,"green","color");
 		
-		JFreeChart barChart = ChartFactory.createBarChart("Histogramme","Number","Couleur", data, PlotOrientation.VERTICAL, true, true, false);
+		JFreeChart barChart = ChartFactory.createBarChart("Histogram","Number","Color", data, PlotOrientation.VERTICAL, true, true, false);
 				
 		ChartPanel CP = new ChartPanel(barChart);
 		pan.add(CP,BorderLayout.CENTER);
 		pan.validate();
 		
-		fenetre_histogramme.setVisible(true);
+		histogram_window.setVisible(true);
 	}
 }

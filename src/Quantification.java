@@ -22,7 +22,7 @@ public class Quantification {
 	 * @return the index if it is in, -1 otherwise
 	 */
 	public static int getIndex(int[] palette, int valeur){
-	//fonction qui permet de retrouve l'index d'une couleur dans la palette, -1 si pas dans la palette
+	
 		for(int i=0;i<palette.length;i++){
 			if(palette[i]==valeur){
 				return i;
@@ -33,64 +33,74 @@ public class Quantification {
 	/**
 	 * Public static function that compress a given image. It indexes each pixel in an array of colors of size 2^L2N_COLORS
 	 * @param image
+	 * @param beautiful 
 	 * @return a compressed BufferedImage
 	 */
-	public static BufferedImage compresse(BufferedImage image){
+	public static BufferedImage compresse(BufferedImage image, boolean beautiful){
 		
-		List<Point> listePoints =new ArrayList<Point>();//liste des pixels de l'image
-		int R=0;int V=0;int B=0;
-		Color pixelcolor; 
-		//creation d'une liste de points contenant tout les pixels 
+		List<Point> listOfPoints =new ArrayList<Point>();//list of the image's pixels
+		int R=0;int G=0;int B=0;
+		Color pixelColor; 
+		
+		//creating a list containing every pixel of the image
 		for(int i=0;i<image.getWidth();i++){
 			
 			for(int j=0;j<image.getHeight();j++){
 				
-				pixelcolor=new Color(image.getRGB(i, j));
-				R=pixelcolor.getRed();
-				V=pixelcolor.getGreen();
-				B=pixelcolor.getBlue();
-				listePoints.add(new Point(R,V,B,0));
+				pixelColor=new Color(image.getRGB(i, j));
+				R=pixelColor.getRed();
+				G=pixelColor.getGreen();
+				B=pixelColor.getBlue();
+				listOfPoints.add(new Point(R,G,B,0));
 			}
 		}
-		//on cree un Kdtree de la bonne taille avec tous les pixels de l'image
-		KdTree tree=new KdTree(listePoints,3,L2N_COLORS+1);
+		//creating a KdTree from the pixels
+		KdTree tree=new KdTree(listOfPoints,3,L2N_COLORS+1);
 		
-		//on remplit la palette, chaque point a un indice
+		//filling the palette, each point has an index
 		List<Point> palette=tree.getColors(L2N_COLORS);
-		int nb_couleurs=palette.size();
-		for(int i=0;i<nb_couleurs;i++){
+		int numberOfColors=palette.size();
+		for(int i=0;i<numberOfColors;i++){
 			palette.get(i).setOneCoord(3,i);
 		}
-		//cette fois on fait un Kdtree avec la palette sans prendre en compte la dimension de l index
+		
+		if(beautiful){
+			System.out.println(palette);
+			//lloyd algorithm to have better colors
+			palette=lloyd(palette,listOfPoints,5);
+			System.out.println(palette);
+		}
+		
+		//creating a Kdtree from palette without taking the index dimension into account
 		KdTree tree_palette=new KdTree(palette,3,L2N_COLORS+1);
 		Point p=new Point(0,0,0);
 		Point g;
 		
 		int ig=0;
 		byte index[]=new byte[image.getWidth()*image.getHeight()];
-		//on cree une nouvelle liste de pixels en remplacant chaque pixels par l'indice de son voisin le plus proche dans la palette
+		//new list of pixels, each point is replaced by the index of his closest in the palette
 		for(int i=0;i<image.getHeight();i++){
 			for(int j=0;j<image.getWidth();j++){
 				
-				pixelcolor=new Color(image.getRGB(j, i));
+				pixelColor=new Color(image.getRGB(j, i));
 				
-				R=pixelcolor.getRed();
-				V=pixelcolor.getGreen();
-				B=pixelcolor.getBlue();
+				R=pixelColor.getRed();
+				G=pixelColor.getGreen();
+				B=pixelColor.getBlue();
 				
-				p.setCoord(R,V,B);
-				g=tree_palette.getNearestNeighbor(p);//g est le point de la palette correspondant à p
-				ig=g.getCoord(3);//on transforme g en une couleur 0xRRVVBB
-				index[i*image.getWidth()+j]=(byte)ig;//on met l'indice de g dans la palette
+				p.setCoord(R,G,B);
+				g=tree_palette.getNearestNeighbor(p);//g is the closest to p in the palette
+				ig=g.getCoord(3);//getting index of g in the palette
+				index[i*image.getWidth()+j]=(byte)ig;//putting the index of g in index list
 			}
 		}
-		//Creation de la nouvelle BufferedImage compressee
-		byte r[]=new byte[nb_couleurs];
-		byte v[]=new byte[nb_couleurs];
-		byte b[]=new byte[nb_couleurs];
+		//Creating a new compressed BufferedImage
+		byte r[]=new byte[numberOfColors];
+		byte v[]=new byte[numberOfColors];
+		byte b[]=new byte[numberOfColors];
 		
-		for(int ind=0;ind<nb_couleurs;ind++){
-			for(int j=0;j<nb_couleurs;j++){				
+		for(int ind=0;ind<numberOfColors;ind++){
+			for(int j=0;j<numberOfColors;j++){				
 				if(palette.get(j).getCoord(3)==ind){
 					
 					r[ind]=(byte) palette.get(j).getCoord(0);
@@ -103,13 +113,103 @@ public class Quantification {
 		}
 		DataBufferByte dataBuffer = new DataBufferByte(index, image.getWidth()*image.getHeight());
 		WritableRaster raster=Raster.createPackedRaster(dataBuffer,image.getWidth(),image.getHeight(),8,null);
-		IndexColorModel cm=new IndexColorModel(8,nb_couleurs,r,v,b);
-		BufferedImage image_compressee=new BufferedImage(cm,raster,true,null);
+		IndexColorModel cm=new IndexColorModel(8,numberOfColors,r,v,b);
+		BufferedImage compressedImage=new BufferedImage(cm,raster,true,null);
 		
-		System.out.println("Compression reussie");
+		System.out.println("Compression successfull");
 		
-		return image_compressee;
+		return compressedImage;
 		
+		
+	}
+	
+	/**
+	 * Implementation of the lloyd algorithm,  points of palette are going to converge
+	 * towards a local optimal solution that represent the image with the smallest error. 
+	 * @param palette an initial list of Point, isn't modified
+	 * @param listOfPoints list of Point of the image,
+	 * @param iterMax the number of iteration
+	 * @return a smoothed palette
+	 */
+	private static List<Point> lloyd(List<Point> palette, List<Point> listOfPoints, int iterMax) {
+		List<Point> optimalColors=new ArrayList<Point>();
+		
+		int j=0;
+		//copy of palette
+		for(Point p : palette){
+			optimalColors.add(new Point(p));
+			optimalColors.get(j).setOneCoord(3,j++);
+		}
+		
+		for(int i=0;i<iterMax;i++){
+			//cluster is always reinitialized
+			List<List<Point>> clusters=new ArrayList<List<Point>>();
+			for(int k=0;k<optimalColors.size();k++){
+				clusters.add(new ArrayList<Point>());
+			}
+		
+			centersToClusters(clusters,optimalColors,listOfPoints);//clusters is modified here
+			clustersToCenters(clusters,optimalColors,listOfPoints);//optimalColors is modified here
+		}
+		
+		return optimalColors;
+		
+	}
+	/**
+	 * Function that changes the Points of optimalColor to be closer to the solution
+	 * @param clusters isn't modified
+	 * @param optimalColors is modified
+	 * @param listOfPoints isn't modified
+	 */
+	private static void clustersToCenters(List<List<Point>> clusters,
+			List<Point> optimalColors, List<Point> listOfPoints) {
+		
+		for(int i=0;i<clusters.size();i++){
+			//for each cluster, computation of the center of gravity 
+			Point cog=barycentre(optimalColors.get(i),clusters.get(i),3);
+			//optimalColor[i] is replaced by the center of gravity
+			for(int j=0;j<cog.getCoords().length;j++){
+				optimalColors.get(i).setOneCoord(j,cog.getCoord(j));
+			}
+		}	
+	}
+	
+	/**
+	 * Function that computes the center of gravity of a list
+	 * @param pi an initial point
+	 * @param list is the data for which we need to  compute the center of gravity
+	 * @param dim the number of dimension we should consider 
+	 * @return the center of gravity of list 
+	 */
+	private static Point barycentre(Point pi,List<Point> list,int dim) {
+		
+		int coords[]=new int[dim];
+		//computation of the means for each dimension
+		for(int i=0;i<dim;i++){
+			coords[i]=0;
+			for(Point q : list){
+				coords[i]+=q.getCoord(i);
+			}
+			coords[i]/=list.size();
+		}
+		return new Point(coords);
+	}
+	
+	/**
+	 * Function that makes "clusters[i]" containing same points as the voronoi cell around the
+	 * point centers[i]  
+	 * @param clusters is modified
+	 * @param optimalColors is modified
+	 * @param listOfPoints isn't modified, list of points of the image
+	 */
+	private static void centersToClusters(List<List<Point>> clusters,
+			List<Point> centers, List<Point> listOfPoints) {
+		//creation of a tree containing the centers for a faster search
+		KdTree centersTree=new KdTree(centers,3,1000);
+		for(Point p : listOfPoints){
+			//cluster[i] is filled with the Points of the voronoi cell of centers[i]
+			clusters.get(centersTree.getNearestNeighbor(p).getCoord(3)).add(p);
+		}
 		
 	}
 	

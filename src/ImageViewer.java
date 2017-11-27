@@ -164,10 +164,10 @@ public class ImageViewer extends JFrame
 	}
 	
 	class Histolistener implements ActionListener {
-		/**Listener of the "histogramme" button*/
+		/**Listener of the "histogram" button*/
 		public void actionPerformed(ActionEvent arg0) {
 			
-			Histogramme.createHisto(outputImage.getImage());
+			Histogram.createHisto(outputImage.getImage());
 		}
 	}
 	
@@ -175,7 +175,7 @@ public class ImageViewer extends JFrame
 		/**Listener of the "quantification" button*/
 		public void actionPerformed(ActionEvent arg0) {
 			
-			outputImage.setImage(Quantification.compresse(outputImage.getImage()));
+			outputImage.setImage(Quantification.compresse(outputImage.getImage(),true));
 			output.repaint();
 		}
 	}
